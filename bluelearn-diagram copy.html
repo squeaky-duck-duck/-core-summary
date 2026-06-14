@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BLUE / bluelearn — Idea Map</title>
+<style>
+  :root{
+    --bg1:#fff5fb; --bg2:#f3ecff; --bg3:#eef9f0;
+    --ink:#3a2a4d; --muted:#8a7a9b;
+    --hub1:#b658d6; --hub2:#ff6fae;
+    --card:#ffffff; --line:#e7d8f2;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -8%, var(--bg1), transparent 60%),
+      radial-gradient(1100px 620px at 92% 0%, var(--bg2), transparent 60%),
+      radial-gradient(1000px 700px at 50% 120%, var(--bg3), transparent 55%),
+      #fbf7ff;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 22px 60px}
+  header.top h1{
+    margin:0; font-size:30px; letter-spacing:.2px;
+    background:linear-gradient(90deg,var(--hub1),var(--hub2));
+    -webkit-background-clip:text; background-clip:text; color:transparent; font-weight:800;
+  }
+  header.top p{margin:6px 0 0; color:var(--muted); font-size:14px}
+
+  .controls{
+    display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start;
+    margin:22px 0 6px; padding:16px 18px; background:rgba(255,255,255,.6);
+    border:1px solid var(--line); border-radius:16px; backdrop-filter:blur(4px);
+  }
+  .control-group{display:flex; flex-direction:column; gap:8px}
+  .control-group .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); font-weight:700}
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{
+    cursor:pointer; user-select:none; border:1.5px solid var(--line);
+    background:#fff; color:var(--ink); padding:6px 12px; border-radius:999px;
+    font-size:12.5px; font-weight:600; transition:all .15s ease; display:inline-flex; align-items:center; gap:7px;
+  }
+  .chip .dot{width:9px; height:9px; border-radius:50%}
+  .chip[aria-pressed="false"]{opacity:.38; filter:saturate(.4)}
+  .chip:hover{transform:translateY(-1px)}
+  .spacer{flex:1}
+  .btn{
+    cursor:pointer; border:none; border-radius:999px; padding:8px 16px; font-weight:700; font-size:12.5px;
+    color:#fff; background:linear-gradient(90deg,var(--hub1),var(--hub2)); box-shadow:0 6px 16px rgba(182,88,214,.28);
+  }
+  .btn.secondary{background:#fff; color:var(--hub1); border:1.5px solid var(--line); box-shadow:none}
+
+  .hub{
+    width:max-content; max-width:560px; margin:26px auto 6px; text-align:center;
+    padding:18px 26px; border-radius:20px; color:#fff;
+    background:linear-gradient(135deg,var(--hub1),var(--hub2));
+    box-shadow:0 14px 34px rgba(182,88,214,.34);
+  }
+  .hub h2{margin:0; font-size:20px; font-weight:800}
+  .hub p{margin:4px 0 0; font-size:12.5px; opacity:.92}
+  .stem{width:2px; height:26px; margin:0 auto; background:linear-gradient(var(--hub1),var(--hub2))}
+
+  .sections{display:flex; flex-direction:column; gap:16px; margin-top:6px}
+  .section{
+    border:1px solid var(--line); border-radius:16px; overflow:hidden; background:rgba(255,255,255,.55);
+    box-shadow:0 8px 22px rgba(150,110,190,.10);
+  }
+  .section-head{
+    display:flex; align-items:center; gap:12px; cursor:pointer; padding:14px 18px;
+    color:#fff; background:var(--accent,#aaa);
+  }
+  .section-head .caret{transition:transform .18s ease; font-size:13px}
+  .section.collapsed .caret{transform:rotate(-90deg)}
+  .section-head .title{font-weight:800; font-size:15.5px; flex:1}
+  .section-head .count{font-size:12px; font-weight:700; background:rgba(255,255,255,.25); padding:3px 10px; border-radius:999px}
+  .section-body{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; padding:16px;
+  }
+  .section.collapsed .section-body{display:none}
+
+  .card{
+    position:relative; background:var(--card); border:1px solid var(--line); border-left:5px solid var(--accent,#ccc);
+    border-radius:14px; padding:12px 13px; box-shadow:0 4px 14px rgba(150,110,190,.10);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .card.has-quote{cursor:pointer}
+  .card.has-quote:hover{transform:translateY(-2px); box-shadow:0 9px 22px rgba(150,110,190,.18)}
+  .card .who{
+    font-size:11px; font-weight:800; color:#fff; background:linear-gradient(90deg,var(--hub1),var(--hub2));
+    padding:2px 9px; border-radius:999px; display:inline-block; margin-bottom:7px;
+  }
+  .card .summary{font-size:13.5px; line-height:1.5}
+  .card .quote{
+    margin-top:9px; font-size:12.5px; line-height:1.55; color:#5d4b70; font-style:italic;
+    border-top:1px dashed var(--line); padding-top:9px; display:none;
+  }
+  .card.open .quote{display:block}
+  .card .hint{font-size:10.5px; color:var(--muted); margin-top:7px}
+  .card.hidden{display:none}
+
+  .legend{
+    margin-top:26px; padding:16px 18px; background:rgba(255,255,255,.6);
+    border:1px solid var(--line); border-radius:16px; display:flex; flex-wrap:wrap; gap:16px; align-items:center;
+  }
+  .legend .li{display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600}
+  .legend .li .dot{width:12px; height:12px; border-radius:4px}
+  .mentioned{margin-top:14px; font-size:12px; color:var(--muted)}
+  .mentioned b{color:var(--ink)}
+  footer.note{margin-top:26px; font-size:11.5px; color:var(--muted); text-align:center; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>BLUE / bluelearn — Idea Map</h1>
+    <p id="subtitle"></p>
+  </header>
+
+  <div class="controls">
+    <div class="control-group">
+      <span class="lbl">People</span>
+      <div class="chips" id="peopleChips"></div>
+    </div>
+    <div class="control-group">
+      <span class="lbl">Themes</span>
+      <div class="chips" id="themeChips"></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="control-group">
+      <span class="lbl">View</span>
+      <div class="chips">
+        <button class="btn secondary" id="toggleSections">Collapse all</button>
+        <button class="btn secondary" id="toggleQuotes">Expand quotes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hub" id="hub">
+    <h2 id="hubTitle"></h2>
+    <p id="hubSub"></p>
+  </div>
+  <div class="stem"></div>
+
+  <div class="sections" id="sections"></div>
+
+  <div class="legend" id="legend"></div>
+  <div class="mentioned" id="mentioned"></div>
+
+  <footer class="note">
+    Built from <b>chat-data.json</b> — usernames and the substance of what they said only (dates &amp; labels ignored).<br/>
+    Add more chat later by appending to that file and regenerating; sections redraw automatically.
+  </footer>
+</div>
+
+<script>
+const DATA = {"project": "BLUE — bluelearn", "centerTitle": "BLUE / bluelearn", "centerSubtitle": "Open-source platform for learning any concept", "note": "Rebuilt from raw-chats/full-export.txt (the authoritative export). Each participant has an 'ideas' array; each idea has a 'theme' (key in 'themes'), a 'summary', and an optional 'quote'. To extend: parse a new export with parse_chat.py, append/update ideas here, keep the same shape, and regenerate with build_diagram.py. Only usernames + the substance of what they said are kept; dates and labels are ignored.", "themes": {"coordination": {"label": "Project & Roles", "color": "#8e5cd9"}, "ux": {"label": "Product & UX", "color": "#d36fc9"}, "learning": {"label": "Learning Structure", "color": "#ff7ab8"}, "tech": {"label": "Engineering & Tooling", "color": "#7b5ce0"}, "community": {"label": "Community & Docs", "color": "#e873b0"}, "verification": {"label": "Verification & Disputes", "color": "#b658d6"}, "voting": {"label": "Voting & Ranking", "color": "#ff5f9e"}, "governance": {"label": "Governance & Charter", "color": "#a06cd5"}, "legal": {"label": "Privacy & Law", "color": "#6f4bb0"}, "vision": {"label": "Vision & Philosophy", "color": "#7fc98a"}}, "participants": [{"name": "benzo", "role": "Admin / Director", "ideas": [{"theme": "coordination", "summary": "Frontend wireframes are being built alongside article content (defining sections, keeping data fields consistent across content types); ss1 and Andrea lead it. Wants feedback but asks to avoid public criticism until a v1 exists."}, {"theme": "coordination", "summary": "Shares the project stack: website bluelearn.org, GitHub, blogs via the Sanity API (temporary easy ML translation, moving to internal hosting + an edit UI later); all social handles are reserved but posting strategy is undecided."}, {"theme": "coordination", "summary": "Won't officially announce or share the repo until a concrete v1 exists, even though people will inevitably find it; has reserved BLUE usernames on 50+ platforms."}, {"theme": "learning", "summary": "Consistency across content is the central challenge at scale — manageable but never fully solvable, and harder with 10k–100k articles and more staff/volunteers."}, {"theme": "community", "summary": "Suggests making threads for long discussions on similar ideas, since unsorted text is a lot to get through; has a personal automatic idea-tracking system he may share."}, {"theme": "governance", "summary": "Legal limits on incorporation and Form 1023 (501(c)(3)) mean the goals are reachable but must be split across the Articles of Incorporation, Bylaws, Employee Contracts, etc. — not exactly as presented; will clarify in the meeting."}]}, {"name": "ss1", "role": "Lead — schema & wireframes", "ideas": [{"theme": "coordination", "summary": "Asks everyone to review overall-system.md and database-schema.md and flag thoughts and edge cases."}]}, {"name": "Abyssaloid", "role": "Contributor — systems", "ideas": [{"theme": "learning", "summary": "Prerequisite 'floor' should specify the depth/level/order of knowledge needed — you shouldn't need every Algebra & Arithmetic course before starting Physics."}, {"theme": "learning", "summary": "Let users skip individual guides in a walkthrough if they only need part of it, paired with a warning that skipping proper knowledge can cause harmful results."}, {"theme": "learning", "summary": "Add a 'useful to X' label (or several) to guides — usefulness varies by user, so avoid one universal measure; this lets multiple guides coexist and improves precise retrieval."}, {"theme": "learning", "summary": "Conditional 'If X then Y' scenario design for guides — e.g. an emergency bleeding guide that routes urgent cases to emergency services first, with a liability disclaimer."}, {"theme": "learning", "summary": "To handle inevitable ideological bias, categorize guides by the worldview they cater to and allow user-declared 'prerequisite worldviews', built on explicit base-reality assumptions."}, {"theme": "learning", "summary": "Proposes a universal BLUE dictionary with alternative definitions to unify meanings across users, since whole worldviews hinge on specific word definitions — monumental but bias-resolving."}, {"theme": "verification", "summary": "Clarifying the out-of-scope verification rules: should a verifier ignore a worldview-based categorical error even when it contradicts mathematical causality or could cause real harm (flat-earth sailing example)?", "quote": "the verifier ought not allow such a thing to alter their final judgement... Even if the categorical error directly counters causality in mathematics? Or may cause harm if acted upon?"}, {"theme": "verification", "summary": "The dispute/appeal system could get flooded, since people who truly believe in their guide will keep re-appealing for another chance."}, {"theme": "verification", "summary": "Anti-spam fix: a cooldown or non-currency 'dedication' cost between disputes to shrink request volume and deter low-commitment appeals."}, {"theme": "voting", "summary": "Rubric-weighted voting can be gamed: if downvote weights/reasons are public, users may manipulate their stated reason to gain extra weight, breaking the system."}, {"theme": "voting", "summary": "Fix: mark such cases 'special' so moderators weigh them by their own judgement, and tune the re-review trigger count — trading some speed for resistance to manipulation."}, {"theme": "voting", "summary": "Proposes an activity-based participation tag: if a user generates X of N loggable activities within a 30–91 day window, they count as actively participating (and eligible to vote)."}, {"theme": "governance", "summary": "Answers the open charter questions: incorporate where wealthy owners do (with international legal counsel), pass liability to users, fund via a cooperatively-voted GoFundMe, and treat the operating agreement like a constitution with an ~80% (flexible) vote threshold."}, {"theme": "governance", "summary": "Audit-log tampering (erasing/altering any log) should auto-trigger a termination vote against the offender — anti-corruption through public, omni-rank action logging; asks whether such triggers are decided by house vote or arbitrarily.", "quote": "The best way to achieve corruption is to make reality unclear, and then frame pieces of the Truth to those most easily convinced."}, {"theme": "governance", "summary": "Warns the TC's 'hinge words' (accessible, practical, core function) must be defined precisely — the way to attack a word-based constitution is to capture a 'word council' and quietly redefine its terms; also notes outside non-members are immune to the TC."}, {"theme": "governance", "summary": "Best defense against capture is to immortalize the system through strong open-sourcing, with staff transferring across proxied iterations if the original is ever shut down."}, {"theme": "tech", "summary": "Wants a program that crawls and indexes definitions from any source across the internet to seed the dictionary."}, {"theme": "tech", "summary": "Confident he can find a way around Anubis (the AI firewall); treats security as an arms race where each step reveals the next, and sets out to research it."}, {"theme": "tech", "summary": "Proposes a distributed 'chain' system that splits scraping computation across willing hosts by capability (%-based task division) so compute cost becomes negligible at scale."}, {"theme": "tech", "summary": "To beat Anubis, reverse-engineer its configs and rapidly test scraper variants (BFS/Dijkstra-style) to find one that evades detection — noting that finding triggers differs from computing the SHA."}, {"theme": "community", "summary": "Requests voice channels for real-time talk — possibly mod-supervised and themed for productive use; suggests opening a thread about it."}, {"theme": "community", "summary": "VCs could be both fun (a 'Minecraft civilization server for BLUE') and productive, but the main risk is documentation — verbal talk is easy to gloss over, so recording/transcribing would help."}, {"theme": "community", "summary": "Proposes using the unanswered-questions list: let people submit txt files / Google Doc links of their solutions, compile a summarized list with links, then weigh pros/cons and combine the best parts ('concatenation')."}, {"theme": "legal", "summary": "Suggests handling consent via an acknowledgment/EULA — 'by using our services you consent to sharing your information' — noting one can sign privacy rights away."}, {"theme": "legal", "summary": "If forced to choose between a functioning system and total anonymity, leans toward function — provided a system prevents the collected info from being mishandled, and info is disposed of at every chance."}, {"theme": "vision", "summary": "The whole system reminds him of a complex Venn diagram where every topic/guide can be viewed at once through the natural connections all information shares."}, {"theme": "vision", "summary": "Information also serves an emotional purpose for humans, not just logical/empirical truth, so user needs and the drive to vindicate one's identity/beliefs should rank high in what BLUE prioritizes."}, {"theme": "vision", "summary": "Skeptical of 'one canonical guide per topic' — true neutrality is impossible in fundamental/philosophical topics, so BLUE will inevitably 'pick a side' and lose merit among groups that disagree."}]}, {"name": "Silent", "role": "Contributor — pedagogy & systems", "ideas": [{"theme": "vision", "summary": "Offers a taxonomy of 'kinds of truth' (Feel / Presence / Think × Past / Present / Future) — education spans different truth types; authority ('because I said so') works for children, then knowledge must serve pragmatic, discovery, or empirical purposes before going abstract."}, {"theme": "ux", "summary": "Data fields shouldn't be identical across content types — the medium should match the message, and kindergarten vs postgraduate material need different formats. 'Harmony is not sameness'; structure should support content, not constrain it."}, {"theme": "learning", "summary": "The hierarchy should be traversed like a circuit but built like roads, not railways — there's no true 'cross-niche' content; thinks of skills as recipes, with a 'concept owner' and a 'path owner'."}, {"theme": "learning", "summary": "Verifier qualifications should differ and softly map to levels while avoiding the Peter principle (give dignity to generalists); the power structure should be 'rock-paper-scissors' rather than absolute order, so power never pools in one place."}, {"theme": "ux", "summary": "On choice design: more options isn't better — well-designed defaults quietly govern most behavior, so choosing defaults well is an act of responsibility for everyone who lives inside them."}, {"theme": "ux", "summary": "Article layout: a centralized article with prereqs + table of contents on the left and the next steps/variants graph on the right, with collapsible, dynamic side panels (swipe left/right, WhatsApp-style) since not all info is relevant at once."}, {"theme": "learning", "summary": "Critiques the hierarchy in 'Problems with B.L.U.E.': experts can't define Level 0 (blind to beginner gaps), verifiers create an oracle problem, and strict hierarchy fails because real learning has cycles and parallel tracks.", "quote": "Experts cannot define Level 0. They are blind to beginner gaps. Verifiers create an oracle problem. Who checks the checkers? Strict hierarchy fails. Real learning has cycles and parallel tracks."}, {"theme": "learning", "summary": "Serve tiered summaries: a pre-generated AI summary plus a more detailed writer-made one, and let users throw content into AI if they want — 'don't serve a 5-course meal to someone who wants a burger and fries.'"}, {"theme": "learning", "summary": "Designs a DAG-based spaced-repetition system: skills are nodes with prerequisites and a hidden stability/'break meter'; trying to build on a brittle prerequisite triggers a break event, resets progress, and forces repair until a node becomes permanently 'FUSED'. Enforces structural coherence and the hidden meter prevents gaming."}, {"theme": "verification", "summary": "Asks 'what if the questions are wrong?' — problem framing matters (Goodhart's law), and you can't always rely on people; structurally separate conflicting parties so they progress, and slot unverifiable claims (e.g. flat earth) into an 'authoritative' category until they collide at higher-order thinking."}, {"theme": "voting", "summary": "On ads: if advertisers want to pay to boost their ranking, just let them — but isolate paid boosts on a separate per-article donor leaderboard. 'They just want to see number go up.'"}, {"theme": "community", "summary": "Thinks VCs distract from work but help people unwind and can spark insight for those who think by talking; won't use them himself. Group chats are for connection, not planning or knowledge consolidation."}, {"theme": "community", "summary": "Proposes 'submarine shifts': scribes summarize on hourly / 8-hour / daily cadences, pin the relevant messages, and consolidate each shift into a document so people don't have to backread."}, {"theme": "community", "summary": "Duplication of ideas is fine, but ideas need to be compiled so they gain momentum, since most people don't have time to backread the chats."}, {"theme": "governance", "summary": "Shares an 'operating model for a floor-to-frontier knowledge commons' (~100k volunteer-maintained articles), whose central design constraint is an unreliable, variable-quality volunteer labor force."}, {"theme": "legal", "summary": "Rule of thumb: side with European privacy standards — other countries are more lax, so clearing the stricter European (GDPR) bar is usually the hardest part of international compliance."}]}, {"name": "SebReyWriter", "role": "Contributor — Terms & Charter author", "ideas": [{"theme": "governance", "summary": "Authors and iterates the Termination Clause — a last-resort voting system letting ordinary BLUE users vote to end the membership/employment of any member via a 'Termination Voting Mechanism' that only opens under specific conditions."}, {"theme": "governance", "summary": "Weighs auto-termination vs a termination vote for various offenses, worried about edge cases like someone mistakenly closing the source code, where you might not want automatic removal."}, {"theme": "governance", "summary": "An appeal/trial/vote process is more thorough but slow; a termination vote is a good compromise since 'mistakes' may signal a pattern and member distrust justifies removal — with optional appeal if new evidence appears."}, {"theme": "governance", "summary": "Removed 'automatic'/'perpetual' from the TC (per benzo, those invite wrongful-termination suits), replacing 'automatic' with 'after certification'; added an Entrenchment Clause requiring 2/3 of ALL members to amend the TC, with maintainer discretion on vote percentages."}, {"theme": "governance", "summary": "Worries the 2/3-of-all-members bar may be too high (few active voters), making amendment easier; the goal is to make the TC harder to change once filed. Ties voting eligibility to activity within the 90-day window (defined simply as logging in at least once per 90 days)."}, {"theme": "governance", "summary": "Accepts that outside (non-member) smear campaigns can't be legally countered — like all legally-bound systems, some vulnerabilities are unavoidable and 'we can only do our best.'"}, {"theme": "governance", "summary": "Explains the Entrenchment Clause lets regular users overthrow leadership that drifts; the mission can't change without amending the Articles of Incorporation (2/3 supermajority), and redirecting assets auto-triggers a termination vote against whoever closes the financial logbook."}, {"theme": "legal", "summary": "Sees 'appropriate complaint channels' as BLUE's due process, but a simple form + evidence + director review won't fit every case — and if a truly thorough investigation existed, you might not need a termination clause at all.", "quote": "if we really implemented a highly thorough investigative procedure... I don't see why you would need a termination clause at all. Due process would be good enough wouldn't it?"}, {"theme": "legal", "summary": "Clarifies a complaint won't trigger instant termination — claimants must provide evidence, and the case/evidence can be public without exposing the claimant's identity."}, {"theme": "legal", "summary": "Proposes a rule: to open a termination vote the evidence/case/identity of claimants must be public; otherwise complaints go through the standard process, and choosing anonymity nullifies the chance of a termination vote.", "quote": "If a complainant wishes to remain anonymous, this will nullify the chance for a Termination Vote."}, {"theme": "legal", "summary": "The standard (anonymous) complaint process isn't defined yet — it'll need an internal procedure and possibly a dedicated role to track cases, evidence, and disputes."}, {"theme": "tech", "summary": "On putting the TC on a blockchain for immutability — could work only if the site itself used blockchain, otherwise no one would respect it; 'not a bad idea.'"}, {"theme": "coordination", "summary": "Enthusiastic about recruiting: 'we need devs and talent to help us with v1'; for now Core members must fork the repo, modify, and request a merge."}]}, {"name": "Andrea", "role": "Contributor — design & governance", "ideas": [{"theme": "ux", "summary": "Shares wireframes for the Individual Guide page for layout feedback; an initial 3-column design felt too busy, so it was cut to 2 columns — and asks how the layout should work on mobile."}, {"theme": "tech", "summary": "Helps debug the dev setup: pnpm supabase:start works for her, she's on WSL (Windows 11) while the readme recommends Linux, and a VM may be the best route."}, {"theme": "coordination", "summary": "Notes the bluelearn-org/bluelearn repo isn't announced yet — they're waiting until there's more development progress."}, {"theme": "governance", "summary": "Raises UK whistleblower-protection law and asks whether the US (and members' jurisdictions) have equivalents; suggests the investigation process live in separate docs (Code of Conduct / Whistleblower Policy) to keep bylaws simpler to amend."}, {"theme": "governance", "summary": "Proposes splitting into two clauses — a Termination Clause (who's removed, the process, the accused's rights) and a Mission Protection Clause (can leadership change the org/mission, what threshold, can assets be redirected or the org be captured)."}, {"theme": "governance", "summary": "Defines 'capture' as a malicious actor/group gradually gaining effective control through legitimate governance mechanisms and steering the nonprofit away from its founding mission — not necessarily a hostile takeover."}, {"theme": "legal", "summary": "Argues that requiring public accusations and banning anonymity is risky, poor governance — it discourages reporting, exposes whistleblowers to retaliation, creates liability for unsubstantiated claims, may conflict with whistleblower law, and damages reputation before facts are established.", "quote": "If the identity was public this might result in retaliation. This would prevent people making any claims in fear the person their claim is against would retaliate."}, {"theme": "legal", "summary": "Suggests confidential reporting, anonymous reporting allowed, anti-retaliation protections, and an independent investigation authority."}, {"theme": "legal", "summary": "Account data is personal data under UK GDPR (name, user ID, IP, email); the org is only the data controller, not the owner, and a Terms of Service can't override data-protection, employment, or whistleblowing law.", "quote": "A contract cannot remove obligations under data protection law, employment law, whistleblowing protections."}, {"theme": "legal", "summary": "Even if BLUE wrote 'if you make a complaint we reserve the right to share your data' into its ToS, that may not be legally enforceable and isn't a good idea; supports public identity for termination votes but wants to preserve an anonymity option — and insists they speak to a lawyer."}]}, {"name": "Beatrix", "role": "Contributor — organization & law", "ideas": [{"theme": "governance", "summary": "The termination clause is solid but vulnerable to deceit: a socially skilled actor could frame a weaker one, turning it into a 'hierarchy of crowd control'; the 'bad experiences with a member' condition especially invites abuse. Suggests a dedicated case-documentation team — a 'BLUE justice department'."}, {"theme": "governance", "summary": "The 'who' and how a termination vote is certified is the most important part of the clause — vague wording makes the process variable and a vulnerability, since termination is life-and-death power within BLUE.", "quote": "how a termination vote is certified needs to be fleshed out... if it were not written in fine text, then that process could become variable, and serve as a vulnerability."}, {"theme": "vision", "summary": "On ideology: definitive views on worldviews are impossible without one's own ideology contaminating them, so the fix is to let everyone be represented — users choose which posts fit their ideology (a keyword/LLM-driven 'for you' page), plus author-chosen tags that self-congregate."}, {"theme": "learning", "summary": "Organization makes or breaks BLUE, since organization is what creates the pathways to find data; the most objective tell of an ideology is its terminology and phraseology, but matching must be context-aware, not brute-force keyword matching."}, {"theme": "learning", "summary": "Proposes a forum-style, universally applicable dictionary built from everyone's submissions, where people teach their own usages of terms (a volunteer project has unlimited potential workforce to find them)."}, {"theme": "tech", "summary": "Web scraping can index definitions easily and is simple to build — but the software security arms race never ends."}, {"theme": "community", "summary": "Only a general VC exists; gathering everyone is hard, so idea-documentation is limited to when people and mods are free — but recorded event VCs could still bear fruit."}, {"theme": "legal", "summary": "With anonymous victims, voters can't fairly assess a termination case — no real evidence is weighed, so people vote on intuition ('whoever is most liked') rather than what actually happened; the 'John Doe says SebRey tortured my children' scenario is undefendable.", "quote": "That's a system of 'whoever is the most liked' instead of something functional."}, {"theme": "legal", "summary": "A complaint process needn't be legally rigorous — any followed, public process beats none. Require an announcement plus a structured template (who you are, your relation to the accused, when/how you discovered it, the full account, and the accused's side), with accusers listed publicly and no anonymous 'John Doe' cases.", "quote": "No 'John Doe' cases, since anonymous tips make it especially vulnerable... 'let your vote be informed' should have its place."}, {"theme": "legal", "summary": "Accepts the anonymity drawback but argues the alternative lets a member be removed arbitrarily; wants to prevent framing (fake screenshots) by giving the accused equal platform and making cases thorough — due process keeps bias out of case construction."}, {"theme": "legal", "summary": "Argues a Blue account isn't truly confidential personal data or doxxing — account info falls under a site's Terms of Service, and Discord's royalty-free content license shows hosted content/account info can be shown to others; distinguishes 'equitable arguments' from settled contract law."}, {"theme": "legal", "summary": "A standard Terms of Service resolves the issue (the platform must distribute/display/reproduce user input anyway); prefers Seb's compromise and suggests a large admin pool (~25) so collective corruption is hard. It's impossible to stop anyone attempting a lawsuit — the only thing in BLUE's control is not contradicting actual laws."}, {"theme": "governance", "summary": "Entrench the clause like a 'Blue Constitution' so future admins follow it, with the same due process for every complaint so no case gets outsized coverage — the founders' integrity is the 'OG' appeal even though anyone can fork. Suggests defining 'complaint channels' in their own addendum."}]}, {"name": "DracoFX", "role": "Contributor — editorial guidelines", "ideas": [{"theme": "coordination", "summary": "Intro: will focus on high-level guidelines and practices for writing and managing editors."}, {"theme": "learning", "summary": "Likens the spaced-repetition idea to Kinnu, where learners revisit concepts via quizzes to avoid skill decay and re-review content if they fail."}, {"theme": "community", "summary": "Proposes a 'scribes' role — active members who record and summarize good ideas and constructive debates so leaders don't have to read everything, collating topics into a sheet that links each to its message/thread.", "quote": "the difference between science and fucking around is writing things down."}, {"theme": "community", "summary": "Scribes needn't work rigid 8-hour shifts (too job-like, causes burnout) — let them read back and summarize within 1–2 hours, splitting labor by chat/topic rather than time, and let people ping scribes when needed."}, {"theme": "community", "summary": "Open question on documentation: should the recording burden fall on scribes, idea-authors, or both? A structured Discord-bot form could help but misses coverage, and both-party submission means deduplication labor; a TLDR of core ideas would be welcomed by everyone."}, {"theme": "community", "summary": "Asks people to keep AI output smaller so it doesn't clutter chat, and to put large outputs in a markdown file on GitHub; making every topic indexable stands out as the key idea."}]}, {"name": "Shenka", "role": "Contributor", "ideas": [{"theme": "coordination", "summary": "Notes bluelearn.org already reaches non-developers (it comes up in general chat, and the forms.bluelearn.org leaderboard link leads easily to the main site), even though the website never got a real official announcement."}, {"theme": "governance", "summary": "Suggests a vote-gating role: grant it to anyone who's talked consecutively for a week or more and revoke it after a week of inactivity — only role-holders can vote."}, {"theme": "tech", "summary": "Warns that sites using Anubis (a specialized AI firewall) are hard to scrape — though most low-traffic sites don't use it and usually lack scraper infrastructure; it blocks scrapers for a reason."}, {"theme": "tech", "summary": "If you could bypass Anubis it'd be worth a lot — sell it as a bug bounty (or 'to Google'); notes Anubis is open source, so it can be studied."}]}, {"name": "jayyymie", "role": "Contributor — dev", "ideas": [{"theme": "ux", "summary": "Proposes a 'focus mode' that hides other UI elements and fullscreens the article (like the writing app ellipsus) to combat a too-crowded UI."}, {"theme": "tech", "summary": "Reports a dev-setup issue: 'pnpm supabase start' fails on Windows 11 (needs pnpx or pnpm exec), WSL has problems and eats all his RAM, so he's considering a VM or a Linux laptop."}, {"theme": "governance", "summary": "Flags a flaw in the 2/3 clause: inactive members can't vote, so they should either be excluded after a period of inactivity or have their accounts deleted — which then raises what to do with their content and votes."}]}, {"name": "ファストマン", "role": "Contributor", "ideas": [{"theme": "governance", "summary": "Suggests auto-termination for any BLUE member who places content behind a paywall, and for any termination-system maintainer caught taking bribes or making deals against the clause's purpose."}, {"theme": "governance", "summary": "Proposes an appeal/trial system (with the vote as a last resort, like a jury) so a wrongly-accused person — e.g. someone who mistakenly closed the source code and can prove it — gets a chance to keep their position instead of an instant ban."}]}, {"name": "Squeaky duck", "role": "Contributor", "ideas": [{"theme": "governance", "summary": "Argues all terminations should be final — there's no manpower for a proper appeal system early on (and it'd likely be abused by bad actors); the banned can rejoin with a different email, and each clause point could be expanded (e.g. defining 'harmful experience') like a ToS.", "quote": "i think that all terminations should be final... especially with the high likelihood that it will be used by people who had malicious intent."}]}, {"name": "ExpressIon235", "role": "Contributor — AI docs", "ideas": [{"theme": "coordination", "summary": "New contributor (added AI markdown files); opened 2 PRs and asked for review plus access to bluelearn-org and the repo; fine with the fork→PR workflow."}, {"theme": "tech", "summary": "Floats the 'horrible thought' of putting the TC on a blockchain to make it immutable."}]}]};
+const create = (t,c)=>{const e=document.createElement(t); if(c) e.className=c; return e;};
+
+document.getElementById('subtitle').textContent = DATA.centerSubtitle || '';
+document.getElementById('hubTitle').textContent = DATA.centerTitle || DATA.project || '';
+document.getElementById('hubSub').textContent = DATA.centerSubtitle || '';
+
+const activePeople = new Set(DATA.participants.map(p=>p.name));
+const activeThemes = new Set(Object.keys(DATA.themes));
+let quotesOpen = false;
+let allCollapsed = false;
+
+// flatten ideas with their author, grouped by theme
+const byTheme = {};
+Object.keys(DATA.themes).forEach(k=>byTheme[k]=[]);
+DATA.participants.forEach(p=>{
+  (p.ideas||[]).forEach(idea=>{
+    if(!byTheme[idea.theme]) byTheme[idea.theme]=[];
+    byTheme[idea.theme].push({who:p.name, ...idea});
+  });
+});
+
+// ---- people chips
+const peopleChips = document.getElementById('peopleChips');
+DATA.participants.forEach(p=>{
+  const c = create('div','chip'); c.setAttribute('aria-pressed','true');
+  c.innerHTML = '<span class="dot" style="background:linear-gradient(90deg,#b658d6,#ff6fae)"></span>'+p.name;
+  c.onclick = ()=>{
+    if(activePeople.has(p.name)){activePeople.delete(p.name); c.setAttribute('aria-pressed','false');}
+    else{activePeople.add(p.name); c.setAttribute('aria-pressed','true');}
+    render();
+  };
+  peopleChips.appendChild(c);
+});
+
+// ---- theme chips
+const themeChips = document.getElementById('themeChips');
+Object.entries(DATA.themes).forEach(([k,t])=>{
+  const c = create('div','chip'); c.setAttribute('aria-pressed','true');
+  c.innerHTML = '<span class="dot" style="background:'+t.color+'"></span>'+t.label;
+  c.onclick = ()=>{
+    if(activeThemes.has(k)){activeThemes.delete(k); c.setAttribute('aria-pressed','false');}
+    else{activeThemes.add(k); c.setAttribute('aria-pressed','true');}
+    render();
+  };
+  themeChips.appendChild(c);
+});
+
+// ---- legend
+const legend = document.getElementById('legend');
+Object.entries(DATA.themes).forEach(([k,t])=>{
+  const li = create('span','li');
+  li.innerHTML = '<span class="dot" style="background:'+t.color+'"></span>'+t.label;
+  legend.appendChild(li);
+});
+
+// ---- mentioned
+if(DATA.mentioned && DATA.mentioned.length){
+  document.getElementById('mentioned').innerHTML =
+    'Also referenced (not active here): <b>'+DATA.mentioned.join('</b>, <b>')+'</b>';
+}
+
+// ---- buttons
+document.getElementById('toggleQuotes').onclick = function(){
+  quotesOpen = !quotesOpen;
+  this.textContent = quotesOpen ? 'Collapse quotes' : 'Expand quotes';
+  document.querySelectorAll('.card.has-quote').forEach(c=>c.classList.toggle('open',quotesOpen));
+};
+document.getElementById('toggleSections').onclick = function(){
+  allCollapsed = !allCollapsed;
+  this.textContent = allCollapsed ? 'Expand all' : 'Collapse all';
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('collapsed',allCollapsed));
+};
+
+// ---- render theme sections
+const sections = document.getElementById('sections');
+function render(){
+  sections.innerHTML='';
+  Object.entries(DATA.themes).forEach(([key,th])=>{
+    if(!activeThemes.has(key)) return;
+    const ideas = (byTheme[key]||[]).filter(i=>activePeople.has(i.who));
+    if(ideas.length===0) return;
+
+    const sec = create('div','section');
+    if(allCollapsed) sec.classList.add('collapsed');
+    sec.style.setProperty('--accent', th.color);
+
+    const head = create('div','section-head');
+    head.innerHTML = '<span class="caret">▼</span><span class="title">'+th.label+
+      '</span><span class="count">'+ideas.length+'</span>';
+    head.onclick = ()=>sec.classList.toggle('collapsed');
+    sec.appendChild(head);
+
+    const body = create('div','section-body');
+    ideas.forEach(idea=>{
+      const card = create('div','card');
+      card.style.setProperty('--accent', th.color);
+      let html = '<span class="who">'+idea.who+'</span><div class="summary">'+idea.summary+'</div>';
+      if(idea.quote){
+        card.classList.add('has-quote');
+        if(quotesOpen) card.classList.add('open');
+        html += '<div class="quote">&ldquo;'+idea.quote+'&rdquo;</div><div class="hint">click for original</div>';
+        card.onclick = ()=>card.classList.toggle('open');
+      }
+      card.innerHTML = html;
+      body.appendChild(card);
+    });
+    sec.appendChild(body);
+    sections.appendChild(sec);
+  });
+}
+render();
+</script>
+</body>
+</html>
