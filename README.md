@@ -12,6 +12,8 @@
 <dt>Summary Layout</dt>
   <dd>After summary is finalised -> json </dd>
   <dd> json -> HTML</dd>
+
+  <a href: index.html>core summary </a>
 <footer>
   <p>The biggest issue at the moment is the export of chats, there are several ways of solving this.</p> 
   <p>I am working on finding the most effective way, problem will be resolved this week.</p>
