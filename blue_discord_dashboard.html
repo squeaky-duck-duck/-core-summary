@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B.L.U.E. Discord — chat digest</title>
+<style>
+  :root{
+    --bg:#faf9f5; --surface:#ffffff; --surface2:#f1efe8;
+    --text:#1f1e1c; --text2:#6b6a64; --text3:#94938c;
+    --border:rgba(0,0,0,0.1); --border2:rgba(0,0,0,0.18);
+    --accent:#378ADD;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1c1b19; --surface:#262522; --surface2:#2f2e2a;
+      --text:#ececea; --text2:#a3a29b; --text3:#76756f;
+      --border:rgba(255,255,255,0.12); --border2:rgba(255,255,255,0.2);
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+  h1{font-size:24px;font-weight:600;margin:0 0 4px;}
+  .sub{font-size:14px;color:var(--text2);margin:0 0 1.5rem;}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;}
+  .tab{font-size:13px;padding:7px 14px;border:0.5px solid var(--border2);border-radius:8px;cursor:pointer;background:transparent;color:var(--text2);font-family:inherit;}
+  .tab.active{background:var(--surface2);color:var(--text);font-weight:500;}
+  .tab:hover{background:var(--surface2);}
+  .panel{display:none;}.panel.active{display:block;}
+  .badge{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500;display:inline-block;}
+  .badge-blue{background:#E6F1FB;color:#0C447C;}
+  .badge-purple{background:#EEEDFE;color:#3C3489;}
+  .badge-teal{background:#E1F5EE;color:#085041;}
+  .badge-amber{background:#FAEEDA;color:#633806;}
+  .badge-coral{background:#FAECE7;color:#712B13;}
+  .badge-gray{background:#F1EFE8;color:#444441;}
+  .card{border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;background:var(--surface);}
+  .week-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+  .week-title{font-size:14px;font-weight:500;}
+  .week-date{font-size:12px;color:var(--text2);}
+  .topic-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:flex-start;}
+  .topic-content{font-size:13px;color:var(--text);flex:1;min-width:200px;}
+  .divider{border:none;border-top:0.5px solid var(--border);margin:10px 0;}
+  .q-card{padding:0.75rem 1rem;margin-bottom:0.75rem;background:var(--surface);}
+  .q-text{font-size:14px;color:var(--text);margin-bottom:6px;}
+  .q-meta{font-size:12px;color:var(--text2);}
+  .debate-title{font-size:14px;font-weight:500;margin-bottom:10px;}
+  .pos-row{display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;}
+  .pos-label{font-size:11px;font-weight:500;padding:2px 8px;border-radius:8px;white-space:nowrap;margin-top:1px;}
+  .pos-text{font-size:13px;color:var(--text2);}
+  .landed{font-size:12px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border);}
+  .concern-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);}
+  .concern-item:last-child{border-bottom:none;}
+  .concern-txt{font-size:13px;flex:2;color:var(--text);min-width:180px;}
+  .concern-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;min-width:60px;}
+  .concern-bar{height:100%;border-radius:3px;}
+  .concern-count{font-size:12px;color:var(--text2);min-width:32px;text-align:right;}
+  .day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap;}
+  .day-date{font-size:13px;font-weight:500;}
+  .day-row{font-size:13px;color:var(--text2);margin-bottom:4px;}
+  .day-row b{color:var(--text);font-weight:500;}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+  .metric{background:var(--surface2);border-radius:8px;padding:1rem;}
+  .metric .lbl{font-size:13px;color:var(--text2);margin:0 0 4px;}
+  .metric .val{font-size:24px;font-weight:500;margin:0;}
+  .metric .note{font-size:12px;color:var(--text2);margin:2px 0 0;}
+  .c-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);}
+  .c-rank{font-size:12px;color:var(--text2);min-width:18px;text-align:right;}
+  .c-name{font-size:13px;color:var(--text);min-width:130px;font-weight:500;}
+  .c-bar-wrap{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;min-width:50px;}
+  .c-bar{height:100%;border-radius:4px;background:var(--accent);}
+  .c-val{font-size:12px;color:var(--text2);min-width:74px;text-align:right;}
+  .c-tag{font-size:10px;padding:1px 6px;border-radius:8px;font-weight:500;white-space:nowrap;min-width:58px;text-align:center;}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:12px;color:var(--text2);}
+  .legend span{display:flex;align-items:center;gap:4px;}
+  .foot{font-size:11px;color:var(--text2);margin-top:1rem;}
+  .chart-box{position:relative;width:100%;height:320px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>B.L.U.E. Discord — chat digest</h1>
+  <p class="sub">May 29 – June 20, 2026 · 5,000 messages · 406 participants</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show('topics',this)">Topics</button>
+    <button class="tab" onclick="show('questions',this)">Open questions</button>
+    <button class="tab" onclick="show('debates',this)">Debate map</button>
+    <button class="tab" onclick="show('heatmap',this)">Activity</button>
+    <button class="tab" onclick="show('concerns',this)">Recurring concerns</button>
+    <button class="tab" onclick="show('dailies',this)">Daily cards</button>
+    <button class="tab" onclick="show('people',this)">Contributors</button>
+  </div>
+
+  <div id="topics" class="panel active">
+    <div class="card">
+      <div class="week-header"><span class="badge badge-blue">week 1</span><span class="week-title">Architecture &amp; first sparks</span><span class="week-date">May 29 – Jun 4 · 2,357 msgs</span></div>
+      <div class="topic-row"><span class="badge badge-purple">architecture</span><span class="topic-content">Long debate over centralised vs decentralised structure. Polls lean decentralised, but most agreed starting centralised then opening to forks is pragmatic.</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-teal">certification</span><span class="topic-content">darksecret7 pushes hard for a "trust protocol" — crypto-style skill verification not tied to any single org. Others argue certs need external recognition to matter.</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-amber">tech stack</span><span class="topic-content">React frontend confirmed. Backend: FastAPI (Python) + Actix-web (Rust), PostgreSQL. Linux-only dev environment. shadcn UI library debated.</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-gray">community</span><span class="topic-content">.shenka. wins a hackathon cybersec track (accessible CAPTCHA). Server passes 1,500 members. Waves of newcomers asking how to contribute.</span></div>
+    </div>
+    <div class="card">
+      <div class="week-header"><span class="badge badge-blue">week 2</span><span class="week-title">Content structure &amp; funding reality</span><span class="week-date">Jun 5 – 11 · 1,588 msgs</span></div>
+      <div class="topic-row"><span class="badge badge-teal">content</span><span class="topic-content">Obsidian-style node view proposed for "bird's eye" knowledge map. Hierarchical tag system (seedsyntax). inco0 proposes "related skills" footers on every article.</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-coral">funding</span><span class="topic-content">Heated debate: affiliate kit links vs Wikipedia-style donations vs sponsored content. Skeptics (shalizius7) argue conversion rates will be awful. No resolution.</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-amber">moderation</span><span class="topic-content">How to stop AI slop: community voting, facial verification (rejected as privacy risk), custom CAPTCHA, human moderators. Code of ethics being drafted (dracofx).</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-gray">milestone</span><span class="topic-content">Server reaches ~2,400 members. Prototype exists. 501(c) nonprofit application underway. Sample articles drafted. jimmy022825 reveals 70k-book archive.</span></div>
+    </div>
+    <div class="card">
+      <div class="week-header"><span class="badge badge-blue">week 3</span><span class="week-title">Article format &amp; external comparisons</span><span class="week-date">Jun 12 – 18 · 850 msgs</span></div>
+      <div class="topic-row"><span class="badge badge-teal">content</span><span class="topic-content">Article format discussed — SCP Foundation-style loose template proposed so subject experts without writing skills can still contribute. Verifiers check accuracy, not style.</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-purple">positioning</span><span class="topic-content">MAKiT channel compared to BLUE — community concludes MAKiT is more academic/journal-like. BLUE aims to be more DIY and beginner-friendly ("how to" vs proofs).</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-coral">ux bug</span><span class="topic-content">Google Doc manifesto not responsive on mobile/tablet — ongoing issue tied to protected doc limitations. Flagged multiple times, no fix yet.</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-gray">governance</span><span class="topic-content">Content niche overlap/contradiction problem raised (from original video). Tag system proposed as solution. CORE member identities still semi-mysterious.</span></div>
+    </div>
+    <div class="card">
+      <div class="week-header"><span class="badge badge-blue">week 4</span><span class="week-title">Sustaining momentum</span><span class="week-date">Jun 19 – 20 · 145 msgs</span></div>
+      <div class="topic-row"><span class="badge badge-teal">status</span><span class="topic-content">Community holding energy between announcements. Frontend still in progress. Admins teasing "big announcement soon."</span></div>
+      <hr class="divider">
+      <div class="topic-row"><span class="badge badge-gray">vibe</span><span class="topic-content">Mix of impatient members ("has anything been done?") and optimistic ones. Voice chat briefly opened then locked again within an hour. Generally positive mood.</span></div>
+    </div>
+  </div>
+
+  <div id="questions" class="panel">
+    <p class="sub">Questions raised in chat that never got a clear definitive answer.</p>
+    <div class="q-card" style="border-left:3px solid #E24B4A;"><div class="q-text">Will B.L.U.E. certifications ever be recognised by employers or institutions?</div><div class="q-meta"><span class="badge badge-coral">certification</span> &nbsp; Raised repeatedly by darksecret7, .shenka., shadowdevil3615 &nbsp;·&nbsp; No admin position taken</div></div>
+    <div class="q-card" style="border-left:3px solid #E24B4A;"><div class="q-text">How exactly will AI-generated slop be detected and removed at scale?</div><div class="q-meta"><span class="badge badge-coral">moderation</span> &nbsp; Raised Jun 10–11 by lwrs246, planeboom911 &nbsp;·&nbsp; Multiple proposals, no chosen approach</div></div>
+    <div class="q-card" style="border-left:3px solid #EF9F27;"><div class="q-text">What is the final funding model — how does the project sustain itself long-term?</div><div class="q-meta"><span class="badge badge-amber">funding</span> &nbsp; Debated across multiple days &nbsp;·&nbsp; Affiliate links and donations both floated, nothing confirmed</div></div>
+    <div class="q-card" style="border-left:3px solid #EF9F27;"><div class="q-text">Will there be a Tor/onion version for censorship-resistant access?</div><div class="q-meta"><span class="badge badge-amber">infrastructure</span> &nbsp; Asked by arch.4 (May 31) &nbsp;·&nbsp; sktome said "probably clearnet but maybe onion too" — not decided</div></div>
+    <div class="q-card" style="border-left:3px solid #7F77DD;"><div class="q-text">What is the "CORE" role and who holds it?</div><div class="q-meta"><span class="badge badge-purple">governance</span> &nbsp; Speculated on by sktome, abyssaloid &nbsp;·&nbsp; A few names identified but role never officially explained</div></div>
+    <div class="q-card" style="border-left:3px solid #7F77DD;"><div class="q-text">What will the final domain name be — is bluelearn.org confirmed?</div><div class="q-meta"><span class="badge badge-purple">branding</span> &nbsp; slmn.khail asked May 31 &nbsp;·&nbsp; "bluelearn.org" mentioned later but not officially announced</div></div>
+    <div class="q-card" style="border-left:3px solid #1D9E75;"><div class="q-text">How will content niche overlaps and contradictions between articles be handled?</div><div class="q-meta"><span class="badge badge-teal">content</span> &nbsp; Raised by jojokurato referencing original video &nbsp;·&nbsp; Tag system proposed but not adopted</div></div>
+    <div class="q-card" style="border-left:3px solid #1D9E75;"><div class="q-text">When is the frontend expected to ship and who is working on it?</div><div class="q-meta"><span class="badge badge-teal">dev progress</span> &nbsp; "2–3 weeks" said ~Jun 2 &nbsp;·&nbsp; Very few people in frontend, timeline unclear</div></div>
+  </div>
+
+  <div id="debates" class="panel">
+    <p class="sub">The big arguments — positions held, who held them, and where things landed.</p>
+    <div class="card">
+      <div class="debate-title">Centralised vs decentralised architecture</div>
+      <div class="pos-row"><span class="pos-label" style="background:#E1F5EE;color:#085041">start central</span><span class="pos-text">.shenka., bumblebee_bzzz — decentralisation needs mass adoption first; better to launch centralised and allow forking later.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#FAECE7;color:#712B13">fully decentral</span><span class="pos-text">darksecret7 — centralised = just replacing one monopoly with another. Needs a protocol, not a platform.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#F1EFE8;color:#444441">pragmatic</span><span class="pos-text">elcumbiavillera2, andyrodrigues30 — no human concept is a perfect model; some centralisation is unavoidable.</span></div>
+      <div class="landed">Landed: "start centralised, build framework for decentralisation" (.shenka.). Earlier server polls showed decentralised preference.</div>
+    </div>
+    <div class="card">
+      <div class="debate-title">How should certification work?</div>
+      <div class="pos-row"><span class="pos-label" style="background:#E1F5EE;color:#085041">trust protocol</span><span class="pos-text">darksecret7 — crypto-style skill ledger. Peers-in-work verify you, not an org. "Blockchain for skills, not money."</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#EEEDFE;color:#3C3489">volunteer jury</span><span class="pos-text">bumblebee_bzzz — 5 randomly selected people who already passed the same test verify the next person. Minimises bias.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#FAEEDA;color:#633806">cost barrier</span><span class="pos-text">.shenka. — certs need some cost as a cheating deterrent; could be minimised via volunteer live-testing but hard to scale.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#FAECE7;color:#712B13">work-based</span><span class="pos-text">darksecret7 — the only honest way is seeing someone perform the skill. Portfolio/work evidence over tests.</span></div>
+      <div class="landed">Landed: unresolved. Consensus that current system is imperfect but no chosen alternative. Postponed as "later down the line."</div>
+    </div>
+    <div class="card">
+      <div class="debate-title">Funding model</div>
+      <div class="pos-row"><span class="pos-label" style="background:#E1F5EE;color:#085041">affiliate links</span><span class="pos-text">.shenka. — non-intrusive subject-specific kit links (e.g. CRISPR kits under biology guides). Niche shops love this.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#EEEDFE;color:#3C3489">donations</span><span class="pos-text">inco0 — Wikipedia model: big email campaigns to top donors. Pairs with foundation partnerships.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#FAEEDA;color:#633806">sponsored content</span><span class="pos-text">inco0 — blood-type-test guide sponsored by the kit brand. Product placement that is the lesson itself.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#FAECE7;color:#712B13">sceptical</span><span class="pos-text">shalizius7 — conversion rates will be awful for a small site; only gambling/adult ad buyers take small traffic.</span></div>
+      <div class="landed">Landed: still open. Affiliate links + donations + eventual grants seen as most likely combo. No formal decision.</div>
+    </div>
+    <div class="card">
+      <div class="debate-title">Preventing AI slop</div>
+      <div class="pos-row"><span class="pos-label" style="background:#E1F5EE;color:#085041">community votes</span><span class="pos-text">deathwish288 — users flag suspected AI content; threshold triggers moderator review.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#EEEDFE;color:#3C3489">human mod</span><span class="pos-text">neo_quantum — real human moderation with verification protocols. Slower but more reliable.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#FAEEDA;color:#633806">custom CAPTCHA</span><span class="pos-text">placeholder_name_123 — custom system that doesn't train AI models. Email verification as secondary layer.</span></div>
+      <div class="pos-row"><span class="pos-label" style="background:#FAECE7;color:#712B13">face verify</span><span class="pos-text">deathwish288 — facial similarity to block multi-account abuse. Rejected by others as a privacy risk.</span></div>
+      <div class="landed">Landed: unresolved. Facial verification rejected. Human moderation + CAPTCHA most favoured but not formalised.</div>
+    </div>
+  </div>
+
+  <div id="heatmap" class="panel">
+    <p class="sub">Exact message volume per day, parsed from all 5,000 messages in the export.</p>
+    <div class="chart-box"><canvas id="activityChart" role="img" aria-label="Bar chart of daily message volume from May 29 to June 20 2026. May 29 peaks at 974, June 10 at 796, May 31 at 504.">Daily message counts: May 29 974, May 30 162, May 31 504, Jun 1 158, Jun 2 54, Jun 3 174, Jun 4 291, Jun 5 66, Jun 6 52, Jun 7 125, Jun 8 215, Jun 9 266, Jun 10 796, Jun 11 68, Jun 12 130, Jun 13 73, Jun 14 120, Jun 15 50, Jun 16 181, Jun 17 160, Jun 18 236, Jun 19 118, Jun 20 27.</canvas></div>
+    <div class="metrics" style="margin-top:1.5rem;">
+      <div class="metric"><p class="lbl">total messages</p><p class="val">5,000</p></div>
+      <div class="metric"><p class="lbl">busiest day</p><p class="val">May 29</p><p class="note">974 msgs</p></div>
+      <div class="metric"><p class="lbl">days covered</p><p class="val">23</p></div>
+      <div class="metric"><p class="lbl">avg / day</p><p class="val">217</p></div>
+    </div>
+    <p class="foot">Two spikes dominate: May 29 (architecture + certification debates) and Jun 10 (AI-slop debate + jimmy022825's archive reveal + an @everyone ping incident).</p>
+  </div>
+
+  <div id="concerns" class="panel">
+    <p class="sub">Worries that surface repeatedly across different days and users. Bar = relative frequency in the chat.</p>
+    <div class="concern-item"><span class="concern-txt">"Will it just become another online course site?"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:90%;background:#378ADD;"></div></div><span class="concern-count">~12×</span></div>
+    <div class="concern-item"><span class="concern-txt">"How will it be funded long-term without selling out?"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:80%;background:#1D9E75;"></div></div><span class="concern-count">~10×</span></div>
+    <div class="concern-item"><span class="concern-txt">"Will certs ever be recognised by employers?"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:70%;background:#7F77DD;"></div></div><span class="concern-count">~9×</span></div>
+    <div class="concern-item"><span class="concern-txt">"Is this project too ambitious / will it survive?"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:60%;background:#EF9F27;"></div></div><span class="concern-count">~8×</span></div>
+    <div class="concern-item"><span class="concern-txt">"Will it get bought out or shut down like Sci-Hub?"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:50%;background:#D85A30;"></div></div><span class="concern-count">~6×</span></div>
+    <div class="concern-item"><span class="concern-txt">"How do we stop AI slop and misinformation at scale?"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:45%;background:#BA7517;"></div></div><span class="concern-count">~6×</span></div>
+    <div class="concern-item"><span class="concern-txt">"Admins aren't communicating enough / too slow"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:35%;background:#888780;"></div></div><span class="concern-count">~4×</span></div>
+    <div class="concern-item"><span class="concern-txt">"Centralisation will just create a new monopoly"</span><div class="concern-bar-wrap"><div class="concern-bar" style="width:30%;background:#D4537E;"></div></div><span class="concern-count">~4×</span></div>
+    <p class="foot">Counts are approximate based on sampled messages across the export.</p>
+  </div>
+
+  <div id="dailies" class="panel">
+    <p class="sub">Snapshot cards for the most notable days, with exact message counts.</p>
+    <div class="card">
+      <div class="day-header"><span class="day-date">Friday 29 May 2026</span><span class="badge badge-blue">974 msgs · busiest day</span></div>
+      <div class="day-row"><b>top topic:</b> Massive architecture debate — centralised vs decentralised, kicked off by darksecret7. atproto.com mentioned as a protocol model.</div>
+      <div class="day-row"><b>hot debate:</b> How should certifications work? Four competing models proposed in one conversation.</div>
+      <div class="day-row"><b>community:</b> Off-topic banter spills over (egg curse, negotiation skills, gaming). .shenka. keeps redirecting to off-topic channel.</div>
+      <div class="day-row"><b>notable:</b> bumblebee_bzzz posts a long GitHub argument defending BLUE in an external forum — kickboy0282 critiques the approach.</div>
+    </div>
+    <div class="card">
+      <div class="day-header"><span class="day-date">Saturday 31 May 2026</span><span class="badge badge-teal">504 msgs</span></div>
+      <div class="day-row"><b>top topic:</b> Tech stack deep-dive — React, FastAPI, Rust/Actix, shadcn debated. Linux-only dev environment questioned by wrenlow.mp3.</div>
+      <div class="day-row"><b>milestone:</b> .shenka. submits hackathon project (accessible CAPTCHA, cybersec) — wins best cybersec prize, $140 + domain.</div>
+      <div class="day-row"><b>question:</b> "Will there be a Tor version?" — sktome says possibly; open source so anyone could fork one.</div>
+      <div class="day-row"><b>new idea:</b> neo_quantum proposes reaching out to Crash Course / Complexly as aligned nonprofit partners.</div>
+    </div>
+    <div class="card">
+      <div class="day-header"><span class="day-date">Thursday 4 June 2026</span><span class="badge badge-purple">291 msgs</span></div>
+      <div class="day-row"><b>top topic:</b> Continued feature and content-structure discussion building on the Obsidian node-map idea.</div>
+      <div class="day-row"><b>community:</b> Steady newcomer intake; contributors sorting themselves into frontend/backend/articles.</div>
+    </div>
+    <div class="card">
+      <div class="day-header"><span class="day-date">Tuesday 9 June 2026</span><span class="badge badge-amber">266 msgs</span></div>
+      <div class="day-row"><b>top topic:</b> Funding reality check — shalizius7 challenges the whole model. Long debate on affiliate links, donations, sponsored content.</div>
+      <div class="day-row"><b>notable:</b> cyberrift1 offers to donate bug bounty earnings to BLUE.</div>
+      <div class="day-row"><b>community:</b> World Cup gambling tangent appears; mods redirect. Chaotic energy day.</div>
+    </div>
+    <div class="card">
+      <div class="day-header"><span class="day-date">Wednesday 10 June 2026</span><span class="badge badge-coral">796 msgs · 2nd busiest</span></div>
+      <div class="day-row"><b>top topic:</b> AI slop prevention — community voting, facial recognition, CAPTCHA all proposed and critiqued in the same thread.</div>
+      <div class="day-row"><b>standout member:</b> jimmy022825 reveals a 28-year personal offline archive of 70,000+ books across 120 subjects including declassified material — chat goes wild.</div>
+      <div class="day-row"><b>progress:</b> sktome confirms prototype, roadmap, sample articles, and a 501(c) application in progress.</div>
+      <div class="day-row"><b>incident:</b> An accidental @everyone ping triggers a spam/argument spike — part of why the day is so high-volume.</div>
+    </div>
+    <div class="card">
+      <div class="day-header"><span class="day-date">Thursday 18 June 2026</span><span class="badge badge-gray">236 msgs</span></div>
+      <div class="day-row"><b>top topic:</b> Article format philosophy — verifiers check accuracy only, not style. Each subject can keep its own culture.</div>
+      <div class="day-row"><b>comparison:</b> MAKiT channel vs BLUE discussed — BLUE positioned as more DIY/how-to, MAKiT as academic journal.</div>
+      <div class="day-row"><b>bug:</b> Google Doc manifesto not responsive on mobile — flagged again, tied to protected-doc limits, no fix yet.</div>
+    </div>
+  </div>
+
+  <div id="people" class="panel">
+    <div class="metrics" style="margin-bottom:1.25rem;">
+      <div class="metric"><p class="lbl">unique participants</p><p class="val">406</p></div>
+      <div class="metric"><p class="lbl">top 15 share of all msgs</p><p class="val">52.7%</p></div>
+      <div class="metric"><p class="lbl">sent only 1 message</p><p class="val">202</p><p class="note">~half the server</p></div>
+    </div>
+    <div class="legend">
+      <span><span class="c-tag" style="background:#E1F5EE;color:#085041">regular</span> active ≥10 days</span>
+      <span><span class="c-tag" style="background:#EEEDFE;color:#3C3489">engaged</span> 5–9 days</span>
+      <span><span class="c-tag" style="background:#FAEEDA;color:#633806">burst</span> ≤4 days</span>
+    </div>
+    <div id="contribList"></div>
+    <p class="foot">Bar width = message count relative to the top contributor (.shenka., 371). "Days active" = distinct calendar days the user posted, out of 23.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const contribs = [
+  ['.shenka.',371,7.4,19],['elcumbiavillera2',314,6.3,12],['bumblebee_bzzz',266,5.3,7],
+  ['kickboy0282',253,5.1,9],['placeholder_name_123',216,4.3,11],['vfxgiven',152,3.0,2],
+  ['ryansalt1212',140,2.8,4],['jijainjiji_08055',139,2.8,1],['dracofx',133,2.7,10],
+  ['sktome',126,2.5,15],['shalizius7',123,2.5,3],['beatrix_x_beatrix',112,2.2,7],
+  ['beastrg',105,2.1,12],['neo_quantum',93,1.9,16],['rentheknight',91,1.8,1]
+];
+function tagFor(days){
+  if(days>=10) return ['regular','#E1F5EE','#085041'];
+  if(days>=5) return ['engaged','#EEEDFE','#3C3489'];
+  return ['burst','#FAEEDA','#633806'];
+}
+const maxC = contribs[0][1];
+const listEl = document.getElementById('contribList');
+contribs.forEach(([name,count,pct,days],i)=>{
+  const [tg,bg,fg]=tagFor(days);
+  const row=document.createElement('div');
+  row.className='c-row';
+  row.innerHTML='<span class="c-rank">'+(i+1)+'</span>'+
+    '<span class="c-name">'+name+'</span>'+
+    '<div class="c-bar-wrap"><div class="c-bar" style="width:'+Math.round(count/maxC*100)+'%;"></div></div>'+
+    '<span class="c-val">'+count+' · '+pct+'%</span>'+
+    '<span class="c-tag" style="background:'+bg+';color:'+fg+';">'+tg+' '+days+'d</span>';
+  listEl.appendChild(row);
+});
+
+let chartMade=false;
+function show(id, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='heatmap' && !chartMade && window.Chart){
+    chartMade=true;
+    const labels=['May 29','May 30','May 31','Jun 1','Jun 2','Jun 3','Jun 4','Jun 5','Jun 6','Jun 7','Jun 8','Jun 9','Jun 10','Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18','Jun 19','Jun 20'];
+    const data=[974,162,504,158,54,174,291,66,52,125,215,266,796,68,130,73,120,50,181,160,236,118,27];
+    new Chart(document.getElementById('activityChart'),{
+      type:'bar',
+      data:{labels,datasets:[{label:'messages',data,backgroundColor:'#378ADD',borderRadius:3,borderSkipped:false}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{x:{ticks:{autoSkip:true,maxRotation:45,font:{size:11}},grid:{display:false}},
+          y:{beginAtZero:true,ticks:{font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'}}}}
+    });
+  }
+}
+</script>
+</body>
+</html>
