@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The B.L.U.E. System — Ideas, Decisions & Open Questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f3ec;
+    --bg2:#f1ebe1;
+    --panel:#fffdf9;
+    --ink:#403a34;
+    --muted:#8c8279;
+    --soft:#a89f95;
+    --border:#e7ddcf;
+    --border2:#ded2c0;
+    --accent:#9c7a8a;        /* dusty mauve — titles */
+    --accent-soft:#bfa3ae;
+    --idea:#7f9bb3;          /* muted dusty blue */
+    --idea-bg:#eef2f6;
+    --decision:#8aa98c;      /* sage green */
+    --decision-bg:#eef3ec;
+    --question:#c9a06f;      /* muted apricot/terracotta */
+    --question-bg:#f6efe5;
+    --radius:12px;
+    --serif:'EB Garamond','Cormorant Garamond',Garamond,Georgia,'Times New Roman',serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;font-family:var(--serif);font-size:18px;
+    background:var(--bg);color:var(--ink);line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent)}
+
+  header.hero{
+    padding:54px 28px 30px;border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#fbf8f2,var(--bg));
+    text-align:center;
+  }
+  .hero h1{
+    margin:0 0 10px;font-weight:500;letter-spacing:.5px;
+    font-size:clamp(30px,5vw,50px);color:var(--ink);
+  }
+  .hero h1 span{color:var(--accent)}
+  .hero .tagline{
+    font-style:italic;color:var(--accent);font-size:clamp(17px,2.4vw,21px);
+    margin:2px 0 16px;letter-spacing:.3px;
+  }
+  .hero p.intro{
+    margin:0 auto;color:var(--muted);max-width:760px;font-size:18px;
+  }
+  .legendbar{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-size:15px;color:var(--ink);
+    background:var(--panel);border:1px solid var(--border);padding:6px 14px;border-radius:999px}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .dot.idea{background:var(--idea)} .dot.decision{background:var(--decision)} .dot.question{background:var(--question)}
+
+  .controls{
+    position:sticky;top:0;z-index:20;
+    background:rgba(247,243,236,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+    padding:14px 28px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  }
+  #search{
+    flex:1 1 280px;min-width:200px;font-family:var(--serif);font-size:17px;
+    background:var(--panel);border:1px solid var(--border2);color:var(--ink);
+    padding:11px 16px;border-radius:10px;outline:none;transition:.15s;
+  }
+  #search::placeholder{color:var(--soft);font-style:italic}
+  #search:focus{border-color:var(--accent-soft);box-shadow:0 0 0 3px rgba(156,122,138,.12)}
+  .filters{display:flex;gap:8px;flex-wrap:wrap}
+  .fbtn{
+    cursor:pointer;font-family:var(--serif);font-size:16px;
+    border:1px solid var(--border2);background:var(--panel);color:var(--muted);
+    padding:9px 16px;border-radius:10px;transition:.15s;letter-spacing:.2px;
+  }
+  .fbtn:hover{color:var(--ink);border-color:var(--accent-soft)}
+  .fbtn.active{color:#fff;background:var(--accent);border-color:var(--accent)}
+  .fbtn[data-f="idea"].active{background:var(--idea);border-color:var(--idea)}
+  .fbtn[data-f="decision"].active{background:var(--decision);border-color:var(--decision)}
+  .fbtn[data-f="question"].active{background:var(--question);border-color:var(--question)}
+  .count{margin-left:auto;color:var(--soft);font-size:15px;font-style:italic;white-space:nowrap}
+
+  .layout{display:flex;align-items:flex-start;gap:0;max-width:1280px;margin:0 auto}
+  nav.toc{
+    position:sticky;top:66px;align-self:flex-start;width:250px;flex:0 0 250px;
+    max-height:calc(100vh - 76px);overflow:auto;padding:26px 12px 40px 24px;
+  }
+  nav.toc h3{font-size:13px;text-transform:uppercase;letter-spacing:2.5px;color:var(--soft);
+    font-weight:600;margin:0 0 14px 12px}
+  nav.toc a{display:flex;justify-content:space-between;gap:8px;color:var(--muted);text-decoration:none;
+    padding:8px 12px;border-radius:8px;font-size:17px;border-left:2px solid transparent;transition:.12s}
+  nav.toc a:hover{background:var(--bg2);color:var(--accent);border-left-color:var(--accent-soft)}
+  nav.toc a .n{font-size:14px;color:var(--soft)}
+  main{flex:1 1 auto;min-width:0;padding:20px 28px 90px}
+
+  section.cat{margin:14px 0 38px;scroll-margin-top:78px}
+  .cat-head{display:flex;align-items:baseline;gap:14px;margin:20px 0 4px;cursor:pointer}
+  .cat-head h2{margin:0;font-weight:600;font-size:27px;color:var(--accent);letter-spacing:.3px}
+  .cat-head .toggle{margin-left:auto;color:var(--soft);font-size:15px}
+  .cat-head::after{}
+  .cat-rule{height:1px;background:linear-gradient(90deg,var(--border2),transparent);margin:6px 0 14px}
+  .cat-desc{color:var(--muted);font-size:18px;margin:0 0 18px;max-width:880px;font-style:italic}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+  .card{
+    background:var(--panel);border:1px solid var(--border);
+    border-top:3px solid var(--border2);border-radius:var(--radius);
+    padding:18px 20px;transition:.18s;
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(120,100,80,.08)}
+  .card.idea{border-top-color:var(--idea)}
+  .card.decision{border-top-color:var(--decision)}
+  .card.question{border-top-color:var(--question)}
+  .card .badge{display:inline-block;font-size:12px;font-weight:600;letter-spacing:1.2px;
+    text-transform:uppercase;padding:3px 10px;border-radius:6px;margin-bottom:10px}
+  .card.idea .badge{background:var(--idea-bg);color:#4f6a85}
+  .card.decision .badge{background:var(--decision-bg);color:#4f6e52}
+  .card.question .badge{background:var(--question-bg);color:#9a6e3c}
+  .card h4{margin:2px 0 8px;font-size:21px;font-weight:600;line-height:1.3;color:var(--ink)}
+  .card p{margin:0;font-size:17px;color:var(--muted);line-height:1.55}
+  .empty{display:none;color:var(--soft);font-style:italic;padding:10px 2px}
+
+  .hidden{display:none !important}
+  mark{background:#f3e2cf;color:var(--ink);border-radius:3px;padding:0 2px}
+  @media (max-width:880px){
+    nav.toc{display:none}
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>The <span>B.L.U.E.</span> System</h1>
+  <p class="tagline">Broad Learning Universal Education System</p>
+  <p class="intro">An interactive digest of the community's discussions, organised by subject and gathered into major ideas, decisions reached, and open questions still being explored.</p>
+  <div class="legendbar">
+    <span class="chip"><span class="dot idea"></span> Idea &amp; Proposal</span>
+    <span class="chip"><span class="dot decision"></span> Decision &amp; Direction</span>
+    <span class="chip"><span class="dot question"></span> Open Question</span>
+  </div>
+</header>
+
+<div class="controls">
+  <input id="search" type="search" placeholder="Search ideas, decisions, questions…" autocomplete="off">
+  <div class="filters">
+    <button class="fbtn active" data-f="all">All</button>
+    <button class="fbtn" data-f="idea">Ideas</button>
+    <button class="fbtn" data-f="decision">Decisions</button>
+    <button class="fbtn" data-f="question">Open Questions</button>
+  </div>
+  <span class="count" id="count"></span>
+</div>
+
+<div class="layout">
+  <nav class="toc" id="toc"><h3>Contents</h3></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const DATA = [
+ {
+  id:"vision", title:"Vision, Mission & Identity",
+  desc:"What B.L.U.E. actually is, what makes it different, and the principles it must protect.",
+  items:[
+   {t:"decision", h:"Free, universal, structured education for everyone", d:"Core mission agreed across the server: knowledge should be accessible to all regardless of money, location, race or gender — teaching not just what something is, but how to do it yourself."},
+   {t:"decision", h:"Guided learning, not an encyclopedia or chatbot", d:"Positioned as distinct from Wikipedia (reference), WikiHow (surface-level) and LLMs. BLUE provides community-built, guided pathways beginner to expert. \"We can't compete with AI companies and shouldn't try — we are different.\""},
+   {t:"decision", h:"Working name evolving to 'BlueLearn'", d:"Directors began referring to the product as BlueLearn; repositories exist under bluelearn-org. B.L.U.E. = Broad Learning Universal Education (system)."},
+   {t:"idea", h:"A 'one-stop shop to create anything from scratch'", d:"Members frame BLUE as a way to build, repair and make things whose knowledge is normally gatekept behind paywalls or academia — physical things, software and processes."},
+   {t:"idea", h:"Long-term: an ecosystem and 'next Library of Alexandria'", d:"Aspirational framings: an ecosystem companies rely on, an offline survival knowledge base, the modern Library of Alexandria — a living, ever-evolving network of shared learning."},
+   {t:"question", h:"Can BLUE surface knowledge that isn't already online?", d:"Recurring challenge: advanced or niche knowledge is often proprietary, patented, or held by few experts who won't document it. Some argue most 'general' knowledge already exists well-organised elsewhere."},
+   {t:"question", h:"Who is the target learner?", d:"Debate over the 'teen vs adult' framing (reframed to beginner / advanced); whether to serve roughly 12-13+ first; whether grade-school and homeschooling belong in scope."},
+  ]
+ },
+ {
+  id:"content", title:"Content Model & Knowledge Structure",
+  desc:"How knowledge is organised: levels, prerequisites, walkthroughs, learning paths, and article formats.",
+  items:[
+   {t:"decision", h:"Knowledge as a prerequisite graph", d:"Topics connect as a directed graph of prerequisites rather than a flat list, so learners can traverse from foundations upward toward a goal guide."},
+   {t:"decision", h:"Walkthroughs vs Learning Paths are distinct", d:"Walkthroughs are auto-generated prerequisite chains to a target guide. Learning Paths are curated 'lenses' over the graph, built by curators, selecting specific variants for a goal or group, with their own revisions."},
+   {t:"decision", h:"Learning Paths can have multiple targets", d:"For example an 'ML engineer' path targets statistics, calculus and probability; an 'indie game dev' path targets programming, music and art. Learners complete a level before advancing."},
+   {t:"decision", h:"Difficulty (label) is not the same as Level (computed)", d:"Levels are generated from prerequisite depth; the team settled on showing guide count and read-time on cards rather than an arbitrary difficulty number, since difficulty is subjective."},
+   {t:"decision", h:"Guides have variants: base, method, amendment", d:"Content is classified as duplicates, methods (variants), amendments, or new bases. A prototype 'guide classifier' was built to test this using sentence embeddings."},
+   {t:"idea", h:"Theory guides vs Practice guides, with strengths and weaknesses", d:"Split content into theory vs practice; allow multiple competing theories or methods per topic, each with documented strengths (problems solved) and weaknesses, updated as research comes in."},
+   {t:"idea", h:"Multiple explanation styles per concept", d:"The same concept offered through several pathways (visual, analogy, mathematical, interactive) and difficulty framings to serve different learners, with expandable detail sections."},
+   {t:"idea", h:"Standard page layout, flexible content", d:"A consistent template and reader view (contents, references, related), but authors keep stylistic freedom. Markdown, Org-mode and wikitext all proposed as the source format."},
+   {t:"idea", h:"Interactive elements", d:"Math notation (LaTeX/KaTeX), graphing, musical notation, 3D viewers and dynamic practice widgets, with a toggle to fall back to static images on weaker devices."},
+   {t:"idea", h:"Declarative vs procedural knowledge", d:"Proposal to formally split content into declarative ('what is X') and procedural ('how to do X'). A faceted search could be built from blocks — e.g. [WHAT IS / HOW TO] + [topic] — to route the learner to the right kind of guide."},
+   {t:"idea", h:"Prerequisites as metadata + progressive disclosure", d:"Encode each guide's prerequisites as front-matter tags (e.g. Requires: [Biology L1, Transistors L2]) so the site auto-generates the prerequisite tree. A guide shows only its immediate prerequisites, expandable backwards — with a dismissible warning so an expert isn't forced through dozens of prior articles."},
+   {t:"decision", h:"Official level hierarchy (1 / 2–4 / 5+ / higher)", d:"Announced scheme: Level 1 = complete beginner/foundational, Levels 2–4 = progressively deeper, Level 5+ = intermediate-to-advanced, higher = specialised/expert/research. More advanced terminology is allowed as levels rise, but clarity and explained terms remain a priority, and guides are linked to prerequisites for a structured path."},
+   {t:"question", h:"How are 'levels' assigned, and by whom?", d:"Unresolved: top-down vs bottom-up authoring; the 'curse of knowledge'; whether a domain committee, consensus, an expert, or relevance-to-progress decides. Leaning toward 'level = progress to reach it', not topic complexity."},
+   {t:"question", h:"Four levels vs an open tree", d:"Proposal to replace a fixed four-level system with a more granular branching tree; comparing levels across distinct fields (physics L5 vs history L5) is seen as meaningless."},
+   {t:"question", h:"Subjective domains (literature, philosophy, politics, history)", d:"How to handle interpretation-heavy fields — present multiple interpretations, teach how to analyse and argue, avoid declaring one 'correct'. Tied to the bias problem."},
+  ]
+ },
+ {
+  id:"review", title:"Review, Verification & Trust",
+  desc:"Turning raw submissions into trustworthy content at scale — the 'Knowledge Review Pipeline'.",
+  items:[
+   {t:"decision", h:"Anyone can submit; not everything is approved", d:"Open contribution is core. Quality is gated by a review process rather than by requiring credentials to post."},
+   {t:"decision", h:"Multi-dimensional trust system (around nine dimensions)", d:"Instead of binary approval, guides are scored on signals (safety, clarity, factual consistency, completeness, history, consensus and more) shown as labels — so niche guides without an available expert reviewer still get a meaningful trust score."},
+   {t:"decision", h:"Credentials and degrees are not required to review", d:"Mandatory qualifications were rejected: they don't guarantee task competence, lag fast-moving fields, reinforce institutional bias, shrink the reviewer pool and reproduce the gatekeeping BLUE opposes."},
+   {t:"decision", h:"Verifier and Test-maker role design", d:"From the founder's original concept: 'test-makers' create the tests that 'verifiers' must pass to verify a domain; initial verifiers seeded from the community. Domain experts mainly verify, and may also write."},
+   {t:"idea", h:"Edits and amendments collected and batch-reviewed", d:"A 'suggestion collector' per guide; suggestions must be backed by evidence; batched periodically and sent to a reviewer, then to the creator to update — for auditability, like reviewing a Git branch."},
+   {t:"idea", h:"Simulate the pipeline before building it", d:"Run a manual role-play (creator, contributors, a planted troll, reviewer) with test guides to stress-test the process against misinformation, spam, injection and impersonation."},
+   {t:"idea", h:"Phase-one review is human-heavy plus simple heuristics", d:"Rule-based checks (headings, code snippets, sentence length, summary present) assist — not replace — human reviewers; machine-learning quality scoring deferred to later scale."},
+   {t:"question", h:"How do you review hard-to-verify, location-specific guides?", d:"The 'Italian plumbing' problem: a guide may need a certified local expert who isn't available, and even a degree doesn't prove the author can write a correct guide. Proposed patches: regional tags, risk categories, warning labels, community correction, expert verification."},
+   {t:"question", h:"Ranking 'better' guides and avoiding manipulation", d:"Upvote / downvote / karma systems risk emotional voting, bot and karma farming and (in decentralised settings) stake-less abuse. No agreed mechanism for when one guide replaces another."},
+  ]
+ },
+ {
+  id:"arch", title:"Architecture & Hosting",
+  desc:"Centralised vs decentralised vs peer-to-peer vs federated — and how content is stored, mirrored and backed up.",
+  items:[
+   {t:"decision", h:"Hybrid: centralised core plus decentralised mirror", d:"Emerging consensus — a central server for traffic, uploads, moderation and editing, plus a read-only decentralised mesh mirror updated on an interval for anonymous access and resilience if the core goes down."},
+   {t:"decision", h:"Open-source centralised canonical graph (developer lean)", d:"Developers argue a coherent moderated knowledge graph (verification, dispute resolution, prerequisite integrity, spam and copyright handling) is far easier centralised, while staying transparent and forkable via open source."},
+   {t:"decision", h:"Offline export and downloadable copies", d:"The site will support downloads and offline use (Kiwix-style), reinforcing the anti-censorship and backup goals."},
+   {t:"idea", h:"Walrus / Sui decentralised storage", d:"An earlier community vote favoured decentralised hosting on Walrus/Sui; a concern was raised that Sui could be a single point of failure (outages leaving content read-only)."},
+   {t:"idea", h:"Independent PDS nodes with a central search index", d:"An MVP exploring whether structured understanding can be derived across independent Personal-Data-Store nodes with a central index that updates when a node comes online — decentralised data, recorded changes."},
+   {t:"idea", h:"Nostr, IPFS and Freenet prototypes", d:"A member built a Nostr-based prototype with community voting and a web-of-trust; IPFS and Freenet were floated as alternatives to slow Tor for static hosting."},
+   {t:"idea", h:"Incremental and torrent snapshots, mesh backup", d:"Daily diff snapshots over torrent (similar to Git), and a 'Library of Babel'-style seed encoding floated as an apocalypse-only backup (later judged to give no real compression)."},
+   {t:"idea", h:"Integrate or collaborate with 'The Brotherhood'", d:"A parallel graph-based project (domains to nodes, source fragments and citations, GPL, self-hostable) offered for collaboration — BLUE focusing on content, Brotherhood on curriculum mapping."},
+   {t:"question", h:"How much decentralisation, really?", d:"Tension between resilience and anti-censorship and the need for a moderatable canonical graph; how to fork a peer-to-peer network; how nodes stay accessible to non-technical hosts."},
+   {t:"question", h:"Data format and schema standard", d:"Markdown vs JSON vs MediaWiki/wikitext; an argument that the real need is a structured, extensible data schema so prototypes interoperate — not just a 'format'."},
+   {t:"idea", h:"Signed content packages + public/private registries", d:"A model where each user runs a local instance; added content is packaged with a cryptographic signature (tamper-evident and attributable) and grouped into 'registries' by subject. Public registries are open; private ones admit nodes via nomination and approval voting — honest small-group consensus rather than infinite scale."},
+   {t:"question", h:"Solve the data-sharing problem first", d:"A recurring caution that there is 'too much hype and not enough systems thinking' — the core problem of how data is shared, synced and moderated across nodes should be solved first, since it constrains every other decision."},
+  ]
+ },
+ {
+  id:"stack", title:"Tech Stack & Development",
+  desc:"Languages, frameworks, frontend weight, tooling and the v1 build plan.",
+  items:[
+   {t:"decision", h:"v1 in active build; backend timeboxed", d:"The database schema (including learning paths and revision edges) is finalised for v1; directors set a backend target and are filling out route logic, after which mostly frontend remains."},
+   {t:"decision", h:"Figma for design, Linear for tasks", d:"Wireframes built in a shared Figma organisation; design and frontend tasks ordered by priority in Linear; contributors assigned pages. Mobile responsiveness deferred — desktop first."},
+   {t:"decision", h:"Comments, saves and likes deferred past v1", d:"No commenting or guide-saving in v1 (extra complexity); upvote/downvote kept. Disputes and appeals also deferred."},
+   {t:"idea", h:"Lightweight, near-static frontend", d:"A strong push for a minimal frontend that loads on old browsers and e-readers; serve static documents with smart routing; use frontend only where interactivity (authoring, verifying) is needed."},
+   {t:"idea", h:"Optimised media (AVIF / WebP)", d:"Convert uploads to AVIF/WebP for size; webm alongside mp4 for video; a possible custom format later (which would need a decoder, conflicting with the no-JavaScript goal)."},
+   {t:"idea", h:"Polyglot microservices (Rust and Python) via gRPC", d:"A proposal to let services use different languages to leverage contributor skills; Rust for the core API, Python for specific or resource-heavy tasks; actix (Rust) and FastAPI (Python) mentioned."},
+   {t:"question", h:"Which backend language?", d:"Unsettled: Rust (admin-leaning, fast and safe but niche, meaning fewer contributors) vs Python / Go / C++ (more popular). Confusion over why both Rust and Python appeared in the scaffold."},
+   {t:"question", h:"Frontend stack and framework", d:"Debate over TypeScript/React 'heaviness' and a 'vibe-coded' look; Astro (great for static, weak for millions of dynamic pages) vs Next.js with ISR; some want no framework at all."},
+   {t:"question", h:"GitHub vs alternatives", d:"A suggestion to migrate from GitHub to Codeberg to avoid Microsoft and align with the mission; a private repo for the prototype was proposed for security."},
+   {t:"question", h:"Should AI be used to write the code?", d:"A recurring split — convenience vs a preference for human and expert-written code; broad distaste for 'vibe-coding' the whole project."},
+  ]
+ },
+ {
+  id:"security", title:"Security, Anti-Abuse & Infrastructure",
+  desc:"Hosting OS, key management, spam and bot defence, and protecting content from tampering.",
+  items:[
+   {t:"decision", h:"Define a threat model first", d:"Repeated consensus: 'you can't defend what you don't know'. Most real-world compromises are social engineering or supply-chain, not exotic OS exploits — so don't over-engineer."},
+   {t:"idea", h:"Immutable Linux images / NixOS for nodes", d:"Debian or Ubuntu for simple infrastructure; immutable, read-only NixOS-style images or Proxmox VM fleets for decentralised nodes so attackers can't persist. OpenBSD and QubesOS also floated; 'security through obscurity' rejected."},
+   {t:"idea", h:"Least-trust, multi-key admin model", d:"Destructive actions require multiple rotating authenticator keys from trusted admins (for example 2 of 3 including the founder, or 5 of 7), keys kept offline; an 'emergency freeze' so nothing can be mass-deleted."},
+   {t:"idea", h:"Layered spam and bot defence", d:"AI pre-check, then verifier or random-majority vote, then time and quantity thresholds before privileged actions (voting, posting); rate limits; activity-based account trust over roughly 30 days."},
+   {t:"idea", h:"Content integrity via signatures and backups", d:"File signatures so content can't be silently tampered; 30 to 90 days of version history before deletion; at least one full off-site backup; data redundancy plus torrented copies."},
+   {t:"idea", h:"Pentest the prototype as a team exercise", d:"A Next.js and OAuth login prototype shared for the community to find and report vulnerabilities together as practice."},
+   {t:"question", h:"Account creation, anonymity and abuse prevention", d:"Tension between anonymous (Tor / UUID-URL) accounts and preventing spam, ban-evasion and bot voting. Cookies vs server-side vote storage; how to keep votes one-per-person without identities."},
+   {t:"question", h:"Anti-scraping vs being indexable", d:"Anubis, Cloudflare, rate-limits and CAPTCHAs vs needing search-engine crawlers for SEO (AI and index scrapers overlap). Data-poisoning, obfuscated formats and honeypots debated but seen as an unwinnable arms race."},
+  ]
+ },
+ {
+  id:"legal", title:"Legal & Compliance",
+  desc:"Entity structure, copyright strategy, liability, terms of service and jurisdiction.",
+  items:[
+   {t:"decision", h:"Go the legal route: 501(c)(3) then NGO", d:"Register as a US non-profit (later an NGO), Wikimedia-style, rather than a stateless Sci-Hub / Anna's-Archive model — to enable funding, partnerships, credibility and legal defence. The domain was paid out of pocket initially."},
+   {t:"decision", h:"Original-content mandate", d:"Host original, user-generated guides (synthesis, not reproduction). Cite sources; use copyrighted material only minimally under fair use; remove infringing content on notice."},
+   {t:"decision", h:"Start with 'common knowledge', avoid grey areas early", d:"Even legal content can be killed by legal fees — so initially avoid anything remotely questionable, and expand to harder topics once funded and established."},
+   {t:"idea", h:"Sources must be verifiable and properly cited", d:"Accept articles only with legal, open or permitted sources; verifiers check citations. Ideas and concepts aren't copyrightable, but exact wording and figures are — paraphrase and attribute."},
+   {t:"idea", h:"Standby, low-cost legal counsel and reserved funds", d:"Keep lawyers on cheap standby; set aside fundraising for legal; consider a contributor licence agreement, code of conduct, conflict-of-interest policy and clear non-profit / project boundaries to survive hostile forks."},
+   {t:"idea", h:"Affiliate links and donations for revenue", d:"'Materials and components' affiliate links and a 'learn more' (free and paid books) section; donations such as ad-free access or offline downloads — but never paywalling the education itself."},
+   {t:"question", h:"Geoblocking and sanctions vs universal access", d:"A US 501(c)(3) may face OFAC rules forcing IP geo-blocking of sanctioned regions; the hope is NGO status plus decentralisation and VPNs mitigate this, but it remains unresolved."},
+   {t:"question", h:"A separate 'grey-area' sibling site?", d:"Proposals for an onion or 'Deep BLUE' mirror with no regional bans for legal-but-risky information — countered that it would invite controversy and hurt donations and legitimacy."},
+   {t:"question", h:"What exactly goes in the terms of service and privacy policy?", d:"Draft: viewers need no account; accounts need minimal data (mostly an email); ban AI data-gathering and non-consensual commercial use. Creator rights over their own guides remain undecided."},
+  ]
+ },
+ {
+  id:"ethics", title:"Ethics, Safety & Bias",
+  desc:"Harmful content, censorship, child safety, and keeping knowledge fair.",
+  items:[
+   {t:"decision", h:"Intent-based harm standard", d:"Guiding principle: refuse only content whose primary and exclusive purpose is to harm others (such as a concealed-weapon guide) — dual-use potential alone is not grounds for restriction."},
+   {t:"decision", h:"No illegal and no adult content (at least initially)", d:"Admins stated no strictly-illegal information; adult material kept off for now. A working Code of Ethics, Honor and Conduct is being drafted (integrity, minimise harm, act independently)."},
+   {t:"idea", h:"Warning and danger labels instead of censorship", d:"Tag risky pages with safety and danger ratings ('exercise caution', 'attempt with others' and so on) and 'what could go wrong' sections — reducing injury and liability without hiding knowledge. A strong anti-censorship stance: 'security through obscurity is bad; it's not information's fault what a learner does'."},
+   {t:"idea", h:"Handle bias by showing multiple perspectives", d:"No content is truly unbiased, and attempts to 'unbias' add bias. Provide plural viewpoints plus primary sources, label commentary and advocacy, and let a 'birds-eye view' average out — especially for history and politics."},
+   {t:"idea", h:"Ethical frameworks proposed", d:"'Ethics of Care' favoured for a 2,500-person community (raise dilemmas case by case); virtue ethics and 'Harmony Ethics' (compassionate love, established roles, reciprocity) also offered for leadership and community conduct."},
+   {t:"question", h:"Where exactly is the line on dangerous knowledge?", d:"A long, unresolved debate (drug precursors, weapons, hacking, body modification). Jurisdictions differ; the 'broad enough vs explicitly harmful' boundary is subjective and may need to vary by location."},
+   {t:"question", h:"Children and age verification", d:"Anonymity vs protecting minors. Most reject ID, selfie or facial verification (privacy, cost, breach risk); leaning toward a birth-date prompt and disclaimer for legal cover, leaving the rest to parents."},
+  ]
+ },
+ {
+  id:"ai", title:"AI Policy",
+  desc:"How BLUE relates to AI training, scraping, and using AI within the project.",
+  items:[
+   {t:"decision", h:"Roughly AI-neutral; no AI-written articles", d:"The lean is AI-neutral: tolerate AI for some tasks (such as machine translation, clearly flagged for human review), but content should be human-written to stay original and high quality."},
+   {t:"decision", h:"Defer the hard AI stance to admins; keep data open meanwhile", d:"The discussion was repeatedly parked pending an official admin position; the default is to keep data accessible and address misuse via legal, not technical, guardrails."},
+   {t:"idea", h:"AI only as a 'librarian' or search aid", d:"An acceptable use floated: a lightweight search and recommendation helper (even table-driven, not a large model) to direct users to guides — never to generate the educational content."},
+   {t:"idea", h:"Accept that scraping will happen; differentiate instead", d:"The prevailing realist view: you can't truly stop scraping without blocking real users, so it's better to be different (guided, community learning) than to win an arms race against trillion-dollar firms."},
+   {t:"question", h:"Block AI training or embrace it?", d:"Three framed options: embrace AI for all; let 'good guys' train while blocking big firms; or shun AI and poison data. No consensus — the middle option founders on 'who decides good vs bad, and anyone can pretend'."},
+   {t:"question", h:"Licensing to constrain AI", d:"Copyleft or Creative-Commons-NonCommercial suggested to force derived models open — but non-commercial clauses violate open-source principles and are hard to enforce."},
+  ]
+ },
+ {
+  id:"certs", title:"Certifications & Assessment",
+  desc:"Whether and how BLUE certifies learning, and how to assess fairly.",
+  items:[
+   {t:"decision", h:"Certifications must stay free", d:"A strong view that BLUE must not earn money from certifications, to avoid incentives that push users toward paid credentials and away from the free mission."},
+   {t:"idea", h:"Work and project-based, transparent assessment", d:"Favoured over rote exams: complete a real project or hurdle; a transparent two-way map links 'what work proves what skill'. Modular 'skill-graph' credentials (from the Brotherhood project) were discussed."},
+   {t:"idea", h:"Anti-cheat and proctoring options", d:"For real certificates: proctored exams, webcam plus workspace camera, screenshot and copy blocking; or short-time-limit multiple choice so answers must be 'at hand' (mitigating AI or brain-chip assistance)."},
+   {t:"idea", h:"Third-party or local accreditation to keep anonymity", d:"Connect learners to outside institutions for the actual certification test, so BLUE stays anonymous and just bridges learner and accrediting body."},
+   {t:"question", h:"Will employers and institutions trust BLUE certs?", d:"A certificate is only as good as trust in it, and online certs historically aren't adopted. Some argue institutions persist for the credential, not the education — so unsolved certs mean not really challenging them."},
+   {t:"question", h:"Certification vs anonymity vs an AI future", d:"Verifying real, anonymous learning is hard; a long philosophical thread questioned whether future AI or brain-chip assistance even counts as 'cheating'."},
+  ]
+ },
+ {
+  id:"design", title:"Design & Branding",
+  desc:"Logo, colours, mascots, interface feel and the visual identity.",
+  items:[
+   {t:"decision", h:"MVP-first design philosophy", d:"Strong agreement: build a minimal viable product with a few features before perfecting; each MVP should test one narrow thing (architecture, data, interface) rather than 'do everything'."},
+   {t:"idea", h:"The 'Ripple' design philosophy", d:"A ripple as the central symbol — knowledge spreading outward without borders; decentralised, fluid and anti-gatekeeping (versus crowns, shields and caps). Proposed for the logo plus an interactive landing-page background, with a 'B' woven into the rings."},
+   {t:"idea", h:"A blue colour palette", d:"Keep one consistent blue across logo, site and promotion; a bright cyan for dark mode and a deep navy with a warm neutral for light mode, to be tuned once the logo exists."},
+   {t:"idea", h:"Field mascots — 'identity over minimalism'", d:"Give each knowledge field a recognisable mascot (leaf-hair for biology, square-hair for maths) for a friendly, community feel — countered by concerns it could look childish or less serious; lineart and gradient outlines offered as a compromise."},
+   {t:"idea", h:"A simple, white-on-blue, learning-themed logo", d:"Minimalist and recognisable (book, pencil, path or roadmap), working as a favicon and server icon; many candidates posted, including ripple sketches and a Voyager-record-inspired idea."},
+   {t:"idea", h:"Crisp reader view and extensible themes", d:"A satisfying reader and Kindle-style view with progress tracking; every element class-tagged so the community can build and share custom themes; a branching, explorable interface floated for later."},
+   {t:"question", h:"Final name and domain", d:"The domain and exact public name are still settling (learn.blue, BlueLearn, and a landing-page prototype already exists)."},
+  ]
+ },
+ {
+  id:"marketing", title:"Marketing & Growth",
+  desc:"How to spread the word, attract contributors, and grow sustainably.",
+  items:[
+   {t:"decision", h:"Organic growth first, no paid ads early", d:"Build community and online presence organically (word of mouth, shareable value) rather than buying ads from the start; the product's free value 'sells itself'."},
+   {t:"decision", h:"Marketing groundwork while waiting on the MVP", d:"Do market research and define tone of voice, target audiences and platforms now; a shared marketing strategy deck is maintained."},
+   {t:"idea", h:"SEO and GEO blog content as a discovery engine", d:"Write keyword-optimised mini-articles ('How to learn anything' and similar) that rank on search and AI and funnel readers to full guides; coordinate topics to avoid duplicates. Specifics raised: target long-tail problem queries, add HowTo and FAQ schema markup, and use programmatic SEO (e.g. 'how to format a hard drive on [OS]')."},
+   {t:"idea", h:"Creator endorsements and short-form clips", d:"Reach educational creators (3Blue1Brown, Veritasium, Vsauce and the like); chop the founding video into reels; demonstrate guide effectiveness in one-to-two-minute clips."},
+   {t:"idea", h:"Email list, 'coming soon' page and newsletter", d:"Own the communication channel via an email list (resilient against social platforms); a 'coming soon' email capture; a community-update newsletter; possibly a podcast, though some say it's out of scope for now."},
+   {t:"idea", h:"Position relative to (not against) Wikipedia", d:"Market as 'the thing to do after the wiki' and for self-education; possibly Wikipedia backlinking; campus posters; niche and underground communities."},
+   {t:"question", h:"Partner with established organisations, or stay independent?", d:"A tension: institutions and creators give reach and credibility, but early partnership risks diluting core values and 'big-tech capture'."},
+  ]
+ },
+ {
+  id:"community", title:"Community Process & Knowledge Management",
+  desc:"Organising a large volunteer community and not losing ideas in the chaos.",
+  items:[
+   {t:"idea", h:"'Scribes' or Archivists to log every idea", d:"A proposed role to read the whole server history and record ideas into a master spreadsheet (a source-of-truth sheet, a compiled-similar-topics sheet, an ultra-compact dashboard) so busy directors can browse decisions — with attribution and timestamps."},
+   {t:"idea", h:"Urgency levels for surfacing topics", d:"Tag logged items by urgency and relevance (safety-level, then immediate, then actionable, then philosophical or long-term) instead of subjective 'priority', to guide what directors act on."},
+   {t:"idea", h:"A shared to-do and goals list to move past brainstorming", d:"Members want a single visible list of concrete tasks so people aren't idle while the MVP is built; a concern that the project is 'still brainstorming'."},
+   {t:"idea", h:"Better draft storage than Discord", d:"Discord gets messy; proposals to store drafts in an Obsidian vault (tags, backlinks, graph) — writers are currently told to draft in Google Docs or Word for backups before posting."},
+   {t:"decision", h:"A clear role hierarchy", d:"Directors and admins (the founder plus leads), moderators, writers, verifiers, test-makers, curators, educators and domain leads — roles non-permanent and performance-reviewed; many recruited via applications."},
+   {t:"decision", h:"Two moderator tiers, expertise over credentials", d:"Moderators split into Basic-Level (foundational concepts) and Advanced-Level (university / master's / PhD topics), chosen by domain and ability to explain clearly — not academic qualifications alone (a strong high-schooler can outrank a PhD for clarity)."},
+   {t:"question", h:"Will people actually contribute, or does it become 'another Wikipedia'?", d:"Concern that there's little incentive to write detailed guides. Proposed non-monetary incentives: the urge to teach, reputation, curiosity, community belonging, preserving knowledge, and improving the ecosystem one personally uses."},
+   {t:"question", h:"Will an AI summariser replace manual archiving?", d:"A tool to summarise chats with AI is reportedly in the works; debated against human scribes (hallucination risk, and AI's own bias about what's 'important')."},
+   {t:"question", h:"Why is leadership relatively quiet?", d:"Some members voiced wanting the founder and admins more visibly involved in day-to-day discussions rather than only announcements."},
+  ]
+ },
+ {
+  id:"writing", title:"Writing, Resources & Early Content",
+  desc:"How articles should be written and the first guides being drafted.",
+  items:[
+   {t:"decision", h:"Writers Guide: Manual of Style and Code of Ethics (drafts)", d:"A draft Manual of Style (a reference for consistent styling, not to be memorised) and Code of Ethics have been started; a model article (an oil-change guide with 'divergence/methods', verifier notes and recall status) is used as a template."},
+   {t:"decision", h:"Cite sources; reference, don't copy", d:"Authors may use copyrighted works as sources and citations (fair use) but must rephrase in their own words and attribute; a Kurzgesagt-style 'sources document' is admired as the bar."},
+   {t:"idea", h:"Avoid link rot via Wayback snapshots", d:"Cite both the source and a Wayback Machine snapshot at the time of citation (ideally automated), guaranteeing a durable backup and contributing to internet archival."},
+   {t:"idea", h:"'Learn more' resources: free vs paid and books", d:"Optional end-of-guide resources — free, no-login tools and books; affiliate and 'materials' links kept separate from the educational content; background information should live on-site, not behind external logins."},
+   {t:"idea", h:"An 'intuition-first' maths content project", d:"A members' effort to rebuild maths guides around intuition, then pitfalls, then applications, then progressive mastery — starting from Euclid's Elements and 'how to think mathematically'."},
+   {t:"idea", h:"Support multiple media types, optimised", d:"Text and images first; add audio and video later (mp4/webm, OPUS audio) with heavy compression and accessibility (for example for blind users) in mind."},
+   {t:"question", h:"What file or markup format for articles?", d:"Markdown vs Org-mode vs plain text vs a custom format — still being asked of the admins; it affects authoring, linking and offline export."},
+   {t:"question", h:"Which subjects and levels to write first?", d:"Many drafts exist (DNA replication, networking, WSL, music notation, Old English, food preservation, permaculture, geometry proofs) but classifying them into levels and ordering the foundation is unresolved."},
+  ]
+ },
+];
+
+// ---- render ----
+const main = document.getElementById('main');
+const toc = document.getElementById('toc');
+const order = {idea:0, decision:1, question:2};
+
+DATA.forEach(cat=>{
+  const a = document.createElement('a');
+  a.href = '#'+cat.id;
+  a.innerHTML = `<span>${cat.title}</span><span class="n">${cat.items.length}</span>`;
+  toc.appendChild(a);
+
+  const sec = document.createElement('section');
+  sec.className='cat'; sec.id=cat.id; sec.dataset.cat=cat.id;
+  const head = document.createElement('div'); head.className='cat-head';
+  head.innerHTML = `<h2>${cat.title}</h2><span class="toggle">&minus;</span>`;
+  const rule = document.createElement('div'); rule.className='cat-rule';
+  const desc = document.createElement('p'); desc.className='cat-desc'; desc.textContent=cat.desc;
+  const grid = document.createElement('div'); grid.className='grid';
+  const empty = document.createElement('div'); empty.className='empty'; empty.textContent='No matching items in this category.';
+
+  cat.items
+    .slice()
+    .sort((x,y)=>order[x.t]-order[y.t])
+    .forEach(it=>{
+      const c=document.createElement('div');
+      c.className='card '+it.t; c.dataset.type=it.t;
+      const label = it.t==='idea'?'Idea':it.t==='decision'?'Decision':'Open Question';
+      c.innerHTML = `<span class="badge">${label}</span><h4>${it.h}</h4><p>${it.d}</p>`;
+      c.dataset.text = (it.h+' '+it.d).toLowerCase();
+      grid.appendChild(c);
+    });
+
+  head.addEventListener('click',()=>{
+    const hidden = grid.classList.toggle('hidden');
+    desc.classList.toggle('hidden', hidden);
+    rule.classList.toggle('hidden', hidden);
+    head.querySelector('.toggle').innerHTML = hidden?'+':'&minus;';
+  });
+
+  sec.appendChild(head); sec.appendChild(rule); sec.appendChild(desc); sec.appendChild(grid); sec.appendChild(empty);
+  main.appendChild(sec);
+});
+
+// ---- filtering & search ----
+let activeFilter='all';
+const searchEl=document.getElementById('search');
+const countEl=document.getElementById('count');
+const fbtns=[...document.querySelectorAll('.fbtn')];
+
+function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+
+function apply(){
+  const q=searchEl.value.trim().toLowerCase();
+  const rx = q? new RegExp('('+esc(q)+')','ig') : null;
+  let shown=0;
+  document.querySelectorAll('section.cat').forEach(sec=>{
+    const cards=[...sec.querySelectorAll('.card')];
+    let visibleInSec=0;
+    cards.forEach(c=>{
+      const typeOk = activeFilter==='all'||c.dataset.type===activeFilter;
+      const textOk = !q || c.dataset.text.includes(q);
+      const vis = typeOk&&textOk;
+      c.classList.toggle('hidden',!vis);
+      if(vis){visibleInSec++;shown++;}
+      const h=c.querySelector('h4'), p=c.querySelector('p');
+      if(rx){
+        h.innerHTML=h.textContent.replace(rx,'<mark>$1</mark>');
+        p.innerHTML=p.textContent.replace(rx,'<mark>$1</mark>');
+      } else {
+        h.innerHTML=h.textContent; p.innerHTML=p.textContent;
+      }
+    });
+    const grid=sec.querySelector('.grid');
+    sec.querySelector('.empty').style.display = (visibleInSec===0 && !grid.classList.contains('hidden'))?'block':'none';
+    sec.style.display = visibleInSec===0 && (q||activeFilter!=='all') ? 'none':'';
+  });
+  countEl.textContent = shown+' item'+(shown===1?'':'s')+' shown';
+}
+
+fbtns.forEach(b=>b.addEventListener('click',()=>{
+  fbtns.forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); activeFilter=b.dataset.f; apply();
+}));
+searchEl.addEventListener('input',apply);
+apply();
+</script>
+</body>
+</html>
